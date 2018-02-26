@@ -9,17 +9,37 @@ bCorrecto = True
 # Tokens
 tokens = [
     'MAS', 'MENOS', 'MULTI', 'DIV', 'MENOR', 'MAYOR', 'DIFERENTE', 'IGUAL', 'MENOR_IGUAL', 'MAYOR_IGUAL',
-    'DOSPUNTOS','PUNTOYCOMA', 'COMA', 'PAREN_IZQ','PAREN_DER',
+    'DOSPUNTOS','PUNTOYCOMA', 'COMA', 'PAREN_IZQ','PAREN_DER', 'CORCHETE_IZQ', 'CORCHETE_DER',
     'LLAVE_IZQ', 'LLAVE_DER', 'ID', 'STRING', 'CTE_INT','CTE_DEC'
 ]
 
 palabras_reservadas = {
-    'int'   	: 'VAR_INT',
-    'dec' 	    : 'VAR_DEC',
-    'inicio' 	: 'PROGRAM',
-    'imprimir' 	: 'PRINT',
-    'si'	    : 'IF',
-    'sino'	    : 'ELSE'
+    'int'   	        : 'VAR_INT',
+    'dec' 	            : 'VAR_DEC',
+    'inicio' 	        : 'INICIO',
+    'imprimir' 	        : 'IMPRIMIR',
+    'si'	            : 'SI',
+    'sino'	            : 'SINO',
+    'colocarObjeto'     : 'COLOCAR',
+    'mover'             : 'MOVER',
+    'rotar'             : 'ROTAR',
+    'girarDerecha'      : 'GIRAR_DER',
+    'girarIzquierda'    : 'GIRAR_IZQ',
+    'caminoLibre'       : 'CAMINO_LIBRE',
+    'deteccion'         : 'DETECCION',
+    'ocultar'           : 'OCULTAR',
+    'posicion'          : 'POSICION',
+    'mapaCuadricula'    : 'MAPA_CUAD',
+    'recogerObjeto'     : 'RECOGER_OBJ',
+    'dejarObjeto'       : 'DEJAR_OBJ',
+    'saltar'            : 'SALTAR',
+    'matarEnemigo'      : 'MATAR_ENEMY',
+    'color'             : 'COLOR',
+    'trazo'             : 'TRAZO',
+    'leer'              : 'LEER',
+    'escribir'          : 'ESCRIBIR',
+    'mostrarValor'      : 'MOSTRAR_VALOR',
+    'fin'               : 'FIN'
 }
 
 # Tokens
