@@ -1,29 +1,25 @@
-# Uriel Avila Vargas
-# A00815578
-# Tarea 3 - ply
-
+# Gramatica
 import ply.lex as lex
 import ply.yacc as yacc
 import sys
 
-# Variable que indica si esta correcta la entrada
+# Bandera que indica si esta correcta la entrada
 bCorrecto = True
 
 # Tokens
 tokens = [
-    'MAS', 'MENOS', 'MULTI', 'DIV','MENOR', 'MAYOR', 'DIFER', 'IGUAL',
+    'MAS', 'MENOS', 'MULTI', 'DIV', 'MENOR', 'MAYOR', 'DIFERENTE', 'IGUAL', 'MENOR_IGUAL', 'MAYOR_IGUAL',
     'DOSPUNTOS','PUNTOYCOMA', 'COMA', 'PAREN_IZQ','PAREN_DER',
-    'LLAVE_IZQ', 'LLAVE_DER', 'ID', 'STRING', 'CTE_INT','CTE_FLOAT'
+    'LLAVE_IZQ', 'LLAVE_DER', 'ID', 'STRING', 'CTE_INT','CTE_DEC'
 ]
 
 palabras_reservadas = {
     'int'   	: 'VAR_INT',
-    'float' 	: 'VAR_FLOAT',
-    'var' 	: 'VAR',
-    'program' 	: 'PROGRAM',
-    'print' 	: 'PRINT',
-    'if'	: 'IF',
-    'else'	: 'ELSE'
+    'dec' 	    : 'VAR_DEC',
+    'inicio' 	: 'PROGRAM',
+    'imprimir' 	: 'PRINT',
+    'si'	    : 'IF',
+    'sino'	    : 'ELSE'
 }
 
 # Tokens
@@ -33,7 +29,9 @@ t_MULTI = r'\*'
 t_DIV = r'\/'
 t_MENOR = r'\<'
 t_MAYOR = r'\>'
-t_DIFER = r'\<\>'
+t_MAYOR_IGUAL = r'\>='
+t_MENOR_IGUAL = r'\<='
+t_DIFERENTE = r'\<\>'
 t_IGUAL = r'\='
 t_DOSPUNTOS = r'\:'
 t_PUNTOYCOMA = r'\;'
@@ -44,18 +42,18 @@ t_LLAVE_IZQ = r'\{'
 t_LLAVE_DER = r'\}'
 t_STRING = r'\"(\\.|[^"])*\"|\"\"'
 t_CTE_INT = r'[0-9]+'
-t_CTE_FLOAT = r'[0-9]+\.[0-9]+'
+t_CTE_DEC = r'[0-9]+\.[0-9]+'
 
 # Tokens + palabras reservadas
 tokens = tokens + list(palabras_reservadas.values())
 
 # ID's
 def t_ID(t):
-    r'[a-zA-Z][a-zA-Z0-9]*'
+    r'[a-zA-Z]([a-zA-Z0-9]|\_)*'
     t.type = palabras_reservadas.get(t.value,'ID')
     return t
 
-# Caracteres que no se toman en cuenta
+# Caracteres ignorados
 t_ignore = ' \t\n'
 
 # Caracteres invalidos
@@ -88,7 +86,7 @@ def p_varsPPP(t):
 
 def p_tipo(t):
     '''tipo :  VAR_INT
-             | VAR_FLOAT'''
+             | VAR_DEC'''
 
 def p_bloque(t):
     'bloque : LLAVE_IZQ list_estatutos LLAVE_DER'
@@ -121,7 +119,7 @@ def p_expresionP(t):
 def p_expresionPP(t):
     '''expresionPP : MAYOR
                    | MENOR
-                   | DIFER'''
+                   | DIFERENTE'''
 
 def p_exp(t):
     'exp : termino mas_terminos'
@@ -152,7 +150,7 @@ def p_op_opcional(t):
 def p_var_constante(t):
     '''var_constante : ID
                | CTE_INT
-               | CTE_FLOAT'''
+               | CTE_DEC'''
 
 def p_condicion(t):
     'condicion : IF PAREN_IZQ expresion PAREN_DER bloque condicionP PUNTOYCOMA'
@@ -183,9 +181,7 @@ parser.parse(contenidoArch)
 # Notificar si el archivo esta correcto o no
 if bCorrecto == True:
     print("Archivo correcto")
-    raw_input()
-    sys.exit()
 else: 
     print("Archivo incorrecto")
-    raw_input()
-    sys.exit()
+raw_input()
+sys.exit()
