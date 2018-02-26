@@ -8,7 +8,7 @@ bCorrecto = True
 
 # Tokens
 tokens = [
-    'MAS', 'MENOS', 'MULTI', 'DIV', 'MENOR', 'MAYOR', 'DIFERENTE', 'IGUAL', 'MENOR_IGUAL', 'MAYOR_IGUAL',
+    'MAS', 'MENOS', 'MULTI', 'DIV', 'MENOR', 'MAYOR', 'DIFERENTE', 'IGUAL', 'MENOR_IGUAL', 'MAYOR_IGUAL', 'ASIGNACION',
     'DOSPUNTOS','PUNTOYCOMA', 'COMA', 'PAREN_IZQ','PAREN_DER', 'CORCHETE_IZQ', 'CORCHETE_DER',
     'LLAVE_IZQ', 'LLAVE_DER', 'ID', 'STRING', 'CTE_INT','CTE_DEC'
 ]
@@ -20,6 +20,7 @@ palabras_reservadas = {
     'imprimir' 	        : 'IMPRIMIR',
     'si'	            : 'SI',
     'sino'	            : 'SINO',
+    'mientras'          : 'MIENTRAS'
     'colocarObjeto'     : 'COLOCAR',
     'mover'             : 'MOVER',
     'rotar'             : 'ROTAR',
@@ -49,10 +50,11 @@ t_MULTI = r'\*'
 t_DIV = r'\/'
 t_MENOR = r'\<'
 t_MAYOR = r'\>'
-t_MAYOR_IGUAL = r'\>='
-t_MENOR_IGUAL = r'\<='
+t_MAYOR_IGUAL = r'\>\='
+t_MENOR_IGUAL = r'\<\='
 t_DIFERENTE = r'\<\>'
-t_IGUAL = r'\='
+t_IGUAL = r'\=\='
+t_ASIGNACION = r'\='
 t_DOSPUNTOS = r'\:'
 t_PUNTOYCOMA = r'\;'
 t_COMA = r'\,'
