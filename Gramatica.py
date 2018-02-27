@@ -9,13 +9,18 @@ bCorrecto = True
 # Tokens
 tokens = [
     'MAS', 'MENOS', 'MULTI', 'DIV', 'MENOR', 'MAYOR', 'DIFERENTE', 'IGUAL', 'MENOR_IGUAL', 'MAYOR_IGUAL', 'ASIGNACION',
+    'OP_Y', 'OP_O', 'RESIDUO',
     'DOSPUNTOS','PUNTOYCOMA', 'COMA', 'PAREN_IZQ','PAREN_DER', 'CORCHETE_IZQ', 'CORCHETE_DER',
-    'LLAVE_IZQ', 'LLAVE_DER', 'ID', 'STRING', 'CTE_INT','CTE_DEC'
+    'LLAVE_IZQ', 'LLAVE_DER', 'ID', 'CTE_STRING', 'CTE_INT','CTE_DEC'
 ]
 
 palabras_reservadas = {
     'int'   	        : 'VAR_INT',
     'dec' 	            : 'VAR_DEC',
+    'boolean'           : 'VAR_BOOL',
+    'string'            : 'VAR_STRING',
+    'verdadero'         : 'BOOL_VERDADERO',
+    'falso'             : 'BOOL_FALSO',
     'inicio' 	        : 'INICIO',
     'imprimir' 	        : 'IMPRIMIR',
     'si'	            : 'SI',
@@ -55,6 +60,9 @@ t_MENOR_IGUAL = r'\<\='
 t_DIFERENTE = r'\<\>'
 t_IGUAL = r'\=\='
 t_ASIGNACION = r'\='
+t_OP_Y = r'\&'
+t_OP_O = r'\|'
+t_RESIDUO = r'\%'
 t_DOSPUNTOS = r'\:'
 t_PUNTOYCOMA = r'\;'
 t_COMA = r'\,'
@@ -62,7 +70,9 @@ t_PAREN_IZQ = r'\('
 t_PAREN_DER = r'\)'
 t_LLAVE_IZQ = r'\{'
 t_LLAVE_DER = r'\}'
-t_STRING = r'\"(\\.|[^"])*\"|\"\"'
+t_CORCHETE_IZQ = r'\['
+t_CORCHETE_DER = r'\]'
+t_CTE_STRING = r'\"(\\.|[^"])*\"|\"\"'
 t_CTE_INT = r'[0-9]+'
 t_CTE_DEC = r'[0-9]+\.[0-9]+'
 
