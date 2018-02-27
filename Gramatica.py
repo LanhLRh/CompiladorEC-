@@ -9,7 +9,7 @@ bCorrecto = True
 # Tokens
 tokens = [
     'MAS', 'MENOS', 'MULTI', 'DIV', 'MENOR', 'MAYOR', 'DIFERENTE', 'IGUAL', 'MENOR_IGUAL', 'MAYOR_IGUAL', 'ASIGNACION',
-    'OP_Y', 'OP_O', 'RESIDUO',
+    'OP_Y', 'OP_O', 'RESIDUO', 'NEGACION',
     'DOSPUNTOS','PUNTOYCOMA', 'COMA', 'PAREN_IZQ','PAREN_DER', 'CORCHETE_IZQ', 'CORCHETE_DER',
     'LLAVE_IZQ', 'LLAVE_DER', 'ID', 'CTE_STRING', 'CTE_INT','CTE_DEC'
 ]
@@ -60,6 +60,7 @@ t_MENOR_IGUAL = r'\<\='
 t_DIFERENTE = r'\<\>'
 t_IGUAL = r'\=\='
 t_ASIGNACION = r'\='
+t_NEGACION = r'\!'
 t_OP_Y = r'\&'
 t_OP_O = r'\|'
 t_RESIDUO = r'\%'
