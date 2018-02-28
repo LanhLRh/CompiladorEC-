@@ -22,10 +22,13 @@ palabras_reservadas = {
     'verdadero'         : 'BOOL_VERDADERO',
     'falso'             : 'BOOL_FALSO',
     'inicio' 	        : 'INICIO',
+    'func'              : 'FUNC',
+    'void'              : 'VOID',
     'imprimir' 	        : 'IMPRIMIR',
     'si'	            : 'SI',
     'sino'	            : 'SINO',
-    'mientras'          : 'MIENTRAS'
+    'mientras'          : 'MIENTRAS',
+    'repetir'           : 'REPETIR',
     'colocarObjeto'     : 'COLOCAR',
     'mover'             : 'MOVER',
     'rotar'             : 'ROTAR',
@@ -101,95 +104,84 @@ lex.lex()
 
 # Reglas
 def p_programa(t):
-    'programa : PROGRAM ID PUNTOYCOMA programaAx bloque'
-def p_programaAx(t):
-    '''programaAx :  vars
+    'programa : definicion INICIO LLAVE_IZQ instruccion LLAVE_DER definicion'
+
+def p_definicion(t):
+    '''definicion :  definicionP
                    | empty'''
+def p_definicionP(t):
+    '''definicionP : funcion definicion
+                    | declaracion definicion'''
 
-def p_vars(t):
-    'vars : VAR varsP DOSPUNTOS tipo PUNTOYCOMA varsPPP'
-def p_varsP(t):
-    'varsP : ID varsPP'
-def p_varsPP(t):
-    '''varsPP : COMA varsP
-              | empty'''
-def p_varsPPP(t):
-    '''varsPPP :  vars
-                | empty'''
+def p_instruccion(t):
+    'instruccion : instruccionP PUNTOYCOMA instruccionP'
+def p_instruccionP(t):
+    '''instruccionP : declaracion | asignacion | condicion | ciclo | llamada | empty'''
 
-def p_tipo(t):
-    '''tipo :  VAR_INT
-             | VAR_DEC'''
-
-def p_bloque(t):
-    'bloque : LLAVE_IZQ list_estatutos LLAVE_DER'
-def p_list_estatutos(t):
-    '''list_estatutos :  estatuto list_estatutos
-                       | empty'''
-
-def p_estatuto(t):
-    '''estatuto : asignacion
-                | condicion
-                | escritura'''
-
+def p_funcion(t):
+    'funcion : FUNC funcionP LLAVE_DER'
+def p_funcionP(t):
+    '''funcionP : tipo cuerpo_funcion REGRESA expresion
+                | VOID cuerpo_funcion'''
+    
+def p_cuerpo_funcion(t):
+    'cuerpo_funcion : ID PAREN_IZQ cfP PAREN_DER LLAVE_IZQ instruccion LLAVE_DER'
+def p_cfP(t):
+    '''cfP : tipo ID cfPP | empty'''
+def p_cfPP(t):
+    '''cfPP : COMA cfPPP | empty'''
+def p_cfPPP(t):
+    '''cfPPP : cfP | ID cfPP'''
+    
+def p_declaracion(t):
+    'declaracion : tipo declaracionP'
+def p_declaracionP(t):
+    'declaracionP : ID declaracionPPP declaracionPP'
+def p_declaracionPP(t):
+    '''declaracionPP : COMA declaracionP | empty'''
+def p_declaracionPPP(t):
+    '''declaracionPPP : expresion | declaracion_lista | empty'''
+    
+def p_declaracion_lista(t):
+    '''declaracion : ASIGNACION lista | CORCHETE_IZQ INT CORCHETE_DER'''
+    
 def p_asignacion(t):
-    'asignacion : ID IGUAL expresion PUNTOYCOMA'
-
-def p_escritura(t):
-    'escritura : PRINT PAREN_IZQ escrituraP PAREN_DER PUNTOYCOMA'
-def p_escrituraP(t):
-    '''escrituraP : expresion escrituraPP
-                  | STRING escrituraPP'''
-def p_escrituraPP(t):
-    '''escrituraPP : COMA escrituraP
-                   | empty'''
-
-def p_expresion(t):
-    'expresion : exp expresionP'
-def p_expresionP(t):
-    '''expresionP : expresionPP exp
-                  | empty'''
-def p_expresionPP(t):
-    '''expresionPP : MAYOR
-                   | MENOR
-                   | DIFERENTE'''
-
-def p_exp(t):
-    'exp : termino mas_terminos'
-def p_mas_terminos(t):
-    '''mas_terminos :  op_termino exp
-                     | empty'''
-def p_op_termino(t):
-    '''op_termino :  MAS
-                   | MENOS'''
-
-def p_termino(t):
-    'termino : factor terminoP'
-def p_terminoP(t):
-    '''terminoP : terminoPP termino
-                | empty'''
-def p_terminoPP(t):
-   '''terminoPP : MULTI
-                | DIV'''
-
-def p_factor(t):
-    '''factor : PAREN_IZQ expresion PAREN_DER
-              | op_opcional var_constante'''
-def p_op_opcional(t):
-    '''op_opcional :  MAS
-               		| MENOS
-               		| empty'''
-
-def p_var_constante(t):
-    '''var_constante : ID
-               | CTE_INT
-               | CTE_DEC'''
+    'asignacion : ID asignacionP ASIGNACION expresion'
+def p_asignacionP(t):
+    '''asignacionP : CORCHETE_IZQ INT CORCHETE_DER | empty'''
 
 def p_condicion(t):
-    'condicion : IF PAREN_IZQ expresion PAREN_DER bloque condicionP PUNTOYCOMA'
+    'condicion : SI PAREN_IZQ expresion PAREN_DER LLAVE_IZQ instrucion condicionP'
 def p_condicionP(t):
-    '''condicionP : ELSE bloque
-                  | empty'''
+    '''condicionP : SINO condicionPP | empty'''
+def p_condicionPP(t):
+    '''condicionPP : LLAVE_IZQ instruccion LLAVE_DER | condicion'''
+
+# MODIFICACION: repetir puede usar una variable entera o una constante entera
+def p_ciclo(t):
+    '''ciclo : MIENTRAS PAREN_IZQ expresion PAREN_DER LLAVE_IZQ instruccion LLAVE_DER
+                | REPETIR repetir LLAVE_IZQ instruccion LLAVE_DER'''
+def p_repetir(t):
+    '''repetir : CTE_INT | ID'''
+
+def p_llamada(t):
+    'llamada : id LLAVE_IZQ llamadaP LLAVE_DER'
+def p_llamadaP(t):
+    '''llamadaP : expresion llamadaPP | empty'''
+def p_llamadaPP(t):
+    '''llamadaPP : COMA llamadaP | empty'''
+    
+def p_expresion(t):
+    'expresion : subExp expresionP'
+def p_expresionP(t):
+    '''expresionP : OP_Y expresion | OP_O expresion | empty'''
+    
+def p_subExp(t):
+    'subExp : subExpP exp subExpPP'
+def p_subExpP(t):
+    '''subExp : NEGACION | empty'''
+def p_subExpPP(t):
+    '''subExpPPP : comparador exp | empty'''
 
 # Vacio (epsilon)
 def p_empty(t):
