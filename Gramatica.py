@@ -221,7 +221,6 @@ def p_boolean(t):
     
     
 # Funciones especiales
-# Funciones especiales
 def p_colocarObjeto(t):
     'colocarObjeto : COLOCAR_OBJETO PAREN_IZQ expresion COMA expresion COMA expresion PAREN_DER'
    
