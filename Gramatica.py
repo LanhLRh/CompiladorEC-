@@ -19,11 +19,12 @@ palabras_reservadas = {
     'dec' 	            : 'VAR_DEC',
     'boolean'           : 'VAR_BOOL',
     'string'            : 'VAR_STRING',
-    'verdadero'         : 'BOOL_VERDADERO',
-    'falso'             : 'BOOL_FALSO',
+    'verdadero'         : 'VERDADERO',
+    'falso'             : 'FALSO',
     'inicio' 	        : 'INICIO',
     'func'              : 'FUNC',
     'void'              : 'VOID',
+    'nulo'              : 'NULO',
     'imprimir' 	        : 'IMPRIMIR',
     'si'	            : 'SI',
     'sino'	            : 'SINO',
@@ -182,7 +183,42 @@ def p_subExpP(t):
     '''subExp : NEGACION | empty'''
 def p_subExpPP(t):
     '''subExpPPP : comparador exp | empty'''
+    
+def p_exp(t):
+    'exp : termino expP'
+def p_expP(t):
+    '''expP : MAS termino | MENOS termino | empty'''
 
+def p_termino(t):
+    'termino : factor terminoP'
+def p_terminoP(t):
+    '''terminoP : MULTI termino | DIV termino | RESIDUO termino | empty'''
+    
+def p_comparador(t):
+    '''comparador : MENOR | MAYOR | IGUAL | DIFERENTE | MENOR_IGUAL | MAYOR_IGUAL'''
+    
+def p_constante(t):
+    '''constante : NULO | CTE_INT | CTE_DEC | CTE_STRING | boolean'''
+    
+def p_factor(t):
+    '''factor : PAREN_IZQ expresion PAREN_DER | opAritmetico valor'''
+def p_opAritmetico(t):
+    '''opAritmetico : MAS | MENOS | empty'''
+    
+def p_lista(t):
+    'lista : CORCHETE_IZQ constante listaP CORCHETE_DER'
+def p_listaP(t):
+    '''listaP : COMA constante listaP | empty'''
+
+def p_valor(t):
+    '''valor : llamada | ID | constante'''
+
+def p_tipo(t):
+    '''tipo : VAR_INT | VAR_DEC | VAR_STRING | VAR_BOOL'''
+    
+def p_boolean(t):
+    '''boolean : VERDADERO | FALSO'''
+    
 # Vacio (epsilon)
 def p_empty(t):
     'empty :'
