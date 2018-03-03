@@ -1,0 +1,23 @@
+inicio
+{
+    posicion(0,0);
+    trazo(verdadero, 1); 
+    color("negro");
+    
+    int contador = 0;
+    int grados = 30;
+
+    mientras (contador < 13)
+    {
+        mover(20);
+        girarIzquierda();
+        mover(20);
+        girarIzquierda();
+        mover(20);
+        girarIzquierda();
+        mover(20);
+        girarIzquierda();
+        contador = contador + 1;
+        rotar(grados);
+    } 
+}

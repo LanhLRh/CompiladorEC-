@@ -1,0 +1,24 @@
+inicio
+{
+    posicion(0,0);      # Se coloca al agente en el origen
+    trazo(true, 1);     # Se habilita el trazo con groso 1
+    color("negro");     # Se elige color negro
+    
+    int contador = 0;   # Se inicializa el contador del ciclo
+    int grados = 30;    # Cantidad de grados que girara el agente
+
+    # Se ejecuta el ciclo que dibuja la figura
+    mientras (contador < 13)
+    {
+        mover(20);          # Se avanza 20 unidades
+        girarIzquierda();   # Se gira a la izquierda 90 grados
+        mover(20);
+        girarIzquierda();
+        mover(20);
+        girarIzquierda();
+        mover(20);
+        girarIzquierda();
+        contador = contador + 1; # Se aumenta el contador
+        rotar(grados);           # Se gira 30 grados
+    } 
+}
