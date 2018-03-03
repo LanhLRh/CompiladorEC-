@@ -166,7 +166,7 @@ def p_repetir(t):
     '''repetir : CTE_INT | ID'''
 
 def p_llamada(t):
-    'llamada : id LLAVE_IZQ llamadaP LLAVE_DER'
+    '''llamada : funcionEsp | id LLAVE_IZQ llamadaP LLAVE_DER'''
 def p_llamadaP(t):
     '''llamadaP : expresion llamadaPP | empty'''
 def p_llamadaPP(t):
@@ -219,6 +219,77 @@ def p_tipo(t):
 def p_boolean(t):
     '''boolean : VERDADERO | FALSO'''
     
+    
+# Funciones especiales
+# Funciones especiales
+def p_colocarObjeto(t):
+    'colocarObjeto : COLOCAR_OBJETO PAREN_IZQ expresion COMA expresion COMA expresion PAREN_DER'
+   
+def p_mover(t):
+    'mover : MOVER PAREN_IZQ expresion PAREN_DER'
+    
+def p_rotar(t):
+    'rotar : ROTAR PAREN_IZQ expresion PAREN_DER'
+    
+def p_girarDerecha(t):
+    'girarDerecha : GIRAR_DER PAREN_IZQ PAREN_DER'
+    
+def p_girarIzquierda(t):
+    'girarIzquierda : GIRAR_IZQ PAREN_IZQ PAREN_DER'
+    
+def p_caminoLibre(t):
+    'caminoLibre : CAMINO_LIBRE PAREN_IZQ PAREN_DER'
+    
+def p_deteccion(t):
+    'deteccion : DETECCION PAREN_IZQ PAREN_DER'
+    
+def p_ocultar(t):
+    'ocultar : OCULTAR PAREN_IZQ expresion PAREN_DER'
+    
+def p_posicion(t):
+    'posicion : POSICION PAREN_IZQ expresion COMA expresion PAREN_DER'
+    
+def p_mapaCuadricula(t):
+    'mapaCuadricula : MAPA_CUAD PAREN_IZQ expresion PAREN_DER'
+    
+def p_recogerObjeto(t):
+    'recogerObjeto : RECOGER_OBJ PAREN_IZQ PAREN_DER'
+    
+def p_dejarObjeto(t):
+    'dejarObjeto : DEJAR_OBJ PAREN_IZQ PAREN_DER'
+    
+def p_saltar(t):
+    'saltar : SALTAR PAREN_IZQ PAREN_DER'
+    
+def p_matarEnemigo(t):
+    'matarEnemigo : MATAR_ENEMY PAREN_IZQ PAREN_DER'
+    
+def p_color(t):
+    'color : COLOR PAREN_IZQ expresion PAREN_DER'
+    
+def p_trazo(t):
+    'trazo : TRAZO PAREN_IZQ expresion COMA expresion PAREN_DER'
+    
+def p_leer(t):
+    'leer : LEER PAREN_IZQ leerP PAREN_DER'
+def p_leerP(t):
+    '''leerP : expresion | empty'''
+    
+def p_escribir(t):
+    'escribir : ESCRIBIR PAREN_IZQ expresion PAREN_DER'
+    
+def p_mostrarValor(t):
+    'mostrarValor : MOSTRAR_VALOR PAREN_IZQ expresion PAREN_DER'
+    
+def p_fin(t):
+    'fin : FIN PAREN_IZQ PAREN_DER'
+    
+def p_funcionEsp(t):
+    '''funcionEsp : colocarObjeto | mover | rotar | girarDerecha | girarIzquierda
+                    | caminoLibre | deteccion | ocultar | posicion | mapaCuadricula
+                    | recogerObjeto | dejarObjeto | saltar | matarEnemigo | color
+                    | trazo | leer | escribir | mostrarValor | fin'''
+    
 # Vacio (epsilon)
 def p_empty(t):
     'empty :'
@@ -234,7 +305,7 @@ def p_error(t):
 parser = yacc.yacc()
 
 # Lectura de archivo
-nombreArchivo = raw_input("Nombre del archivo: ")
+nombreArchivo = input("Nombre del archivo: ")
 archivo = open(nombreArchivo, 'r')
 contenidoArch = archivo.read()
 parser.parse(contenidoArch)    
@@ -244,5 +315,5 @@ if bCorrecto == True:
     print("Archivo correcto")
 else: 
     print("Archivo incorrecto")
-raw_input()
+input()
 sys.exit()
