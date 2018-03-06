@@ -1,21 +1,21 @@
-func void hola()
+func void hola(]
 {
-    int x;
-    x = 3;
+    int x:
+    asa x = 3;
 }
 
-# Hola
-inicio
+// Esto no es un comentario
+inicio void
 {
-    posicion(0,0);
+    posicion{0|0};
     trazo(verdadero, 1); 
     color("negro");
     
     int contador;
     contador = 2;
-    int grados = 2;
+    azul grados = 2;
 
-    mientras (contador < 13)
+    mientras (contador < 13);
     {
         mover(20);
         girarIzquierda();
@@ -27,14 +27,14 @@ inicio
         girarIzquierda();
         contador = contador + 1;
         rotar(grados);
-    }
+    }:
 
-    x = 2; 
+    int = 2; 
 
-    si(1 > 2) {
+    if(1 < 2) {
         escribir("Hola Crayola");
     }
-    sino si (1 == 2)
+    sino si (1 = 2)
     {
         leer("n");
     }

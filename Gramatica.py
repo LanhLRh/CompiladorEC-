@@ -198,7 +198,7 @@ def p_asignacionP(t):
 	print("asignacionP")
 
 def p_condicion(t):
-    'condicion : SI PAREN_IZQ expresion PAREN_DER LLAVE_IZQ instruccion condicionP'
+    'condicion : SI PAREN_IZQ expresion PAREN_DER LLAVE_IZQ instruccion LLAVE_DER condicionP'
     print("condicion")
 def p_condicionP(t):
 	'''condicionP : SINO condicionPP
