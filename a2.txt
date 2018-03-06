@@ -1,11 +1,18 @@
+func void hola()
+{
+    int x;
+    x = 3;
+}
+
 inicio
 {
     posicion(0,0);
     trazo(verdadero, 1); 
     color("negro");
     
-    int contador = 0;
-    int grados = 30;
+    int contador;
+    contador = x;
+    int grados = x;
 
     mientras (contador < 13)
     {
@@ -19,5 +26,7 @@ inicio
         girarIzquierda();
         contador = contador + 1;
         rotar(grados);
-    } 
+    }
+
+	x = 2; 
 }
