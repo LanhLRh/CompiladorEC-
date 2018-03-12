@@ -1,436 +1,227 @@
 # Gramatica
-import ply.lex as lex
 import ply.yacc as yacc
-import sys
+from Tokens import tokens
+from SemanticaEC import *
+import Stack
 
 # Bandera que indica si esta correcta la entrada
 bCorrecto = True
 
-# Tokens
-tokens = [
-    'MAS', 'MENOS', 'MULTI', 'DIV', 'MENOR', 'MAYOR', 'DIFERENTE', 'IGUAL', 'MENOR_IGUAL', 'MAYOR_IGUAL',
-    'ASIGNACION', 'OP_Y', 'OP_O', 'RESIDUO', 'NEGACION',
-    'PUNTOYCOMA', 'COMA', 'PAREN_IZQ','PAREN_DER', 'CORCHETE_IZQ', 'CORCHETE_DER',
-    'LLAVE_IZQ', 'LLAVE_DER', 'ID', 'CTE_STRING', 'CTE_INT','CTE_DEC'
-]
+# Regla Inicial
+def p_programa(p):
+    'programa : NP1_DirProced definicion INICIO NP7_Inicio LLAVE_IZQ instruccion LLAVE_DER definicion imprimir'
 
-palabras_reservadas = {
-    'int'   	        : 'VAR_INT',
-    'dec' 	            : 'VAR_DEC',
-    'boolean'           : 'VAR_BOOL',
-    'string'            : 'VAR_STRING',
-    'verdadero'         : 'VERDADERO',
-    'falso'             : 'FALSO',
-    'inicio' 	        : 'INICIO',
-    'regresa'			: 'REGRESA',
-    'func'              : 'FUNC',
-    'void'              : 'VOID',
-    'nulo'              : 'NULO',
-    'si'	            : 'SI',
-    'sino'	            : 'SINO',
-    'mientras'          : 'MIENTRAS',
-    'repetir'           : 'REPETIR',
-    'colocarObjeto'     : 'COLOCAR',
-    'mover'             : 'MOVER',
-    'rotar'             : 'ROTAR',
-    'girarDerecha'      : 'GIRAR_DER',
-    'girarIzquierda'    : 'GIRAR_IZQ',
-    'caminoLibre'       : 'CAMINO_LIBRE',
-    'deteccion'         : 'DETECCION',
-    'ocultar'           : 'OCULTAR',
-    'posicion'          : 'POSICION',
-    'mapaCuadricula'    : 'MAPA_CUAD',
-    'recogerObjeto'     : 'RECOGER_OBJ',
-    'dejarObjeto'       : 'DEJAR_OBJ',
-    'saltar'            : 'SALTAR',
-    'matarEnemigo'      : 'MATAR_ENEMY',
-    'color'             : 'COLOR',
-    'trazo'             : 'TRAZO',
-    'leer'              : 'LEER',
-    'escribir'          : 'ESCRIBIR',
-    'mostrarValor'      : 'MOSTRAR_VALOR',
-    'fin'               : 'FIN'
-}
-
-# Tokens
-t_MAS = r'\+'
-t_MENOS = r'\-'
-t_MULTI = r'\*'
-t_DIV = r'\/'
-t_MENOR = r'\<'
-t_MAYOR = r'\>'
-t_MAYOR_IGUAL = r'\>\='
-t_MENOR_IGUAL = r'\<\='
-t_DIFERENTE = r'\<\>'
-t_IGUAL = r'\=\='
-t_ASIGNACION = r'\='
-t_NEGACION = r'\!'
-t_OP_Y = r'\&'
-t_OP_O = r'\|'
-t_RESIDUO = r'\%'
-t_PUNTOYCOMA = r'\;'
-t_COMA = r'\,'
-t_PAREN_IZQ = r'\('
-t_PAREN_DER = r'\)'
-t_LLAVE_IZQ = r'\{'
-t_LLAVE_DER = r'\}'
-t_CORCHETE_IZQ = r'\['
-t_CORCHETE_DER = r'\]'
-t_CTE_STRING = r'\"(\\.|[^"])*\"|\"\"'
-t_CTE_INT = r'[0-9]+'
-t_CTE_DEC = r'[0-9]+\.[0-9]+'
-
-# Tokens + palabras reservadas
-tokens = tokens + list(palabras_reservadas.values())
-
-# ID's
-def t_ID(t):
-    r'[a-zA-Z_][a-zA-Z0-9_]*'
-    t.type = palabras_reservadas.get(t.value,'ID')
-    return t
-
-# Caracteres ignorados
-t_ignore = ' \t'
-
-# Comentarios
-def t_COMENTARIO(t):
-	r'\#.*'
-	pass
-
-# Comentarios
-def t_newline(t):
-	r'\n+'
-	t.lexer.lineno += len(t.value)
-
-# Caracteres invalidos
-def t_error(t):
-    global bCorrecto
-    bCorrecto = False
-    print("Caracter ilegal '%s'" % t.value[0])
-    t.lexer.skip(1)
-
-# Construcion del lexer
-lex.lex()
-
-
-
-# Reglas
-def p_programa(t):
-    'programa : definicion INICIO LLAVE_IZQ instruccion LLAVE_DER definicion'
-    print("programa")
-
-def p_definicion(t):
+def p_definicion(p):
     '''definicion :  definicionP
                    | empty'''
-    print("definicion")
-def p_definicionP(t):
+def p_definicionP(p):
     '''definicionP : funcion definicion
                     | declaracion definicion'''
-    print("definicionP")
 
-def p_instruccion(t):
-    'instruccion : instruccionP'
-    print("instruccion")
-def p_instruccionP(t):
-    '''instruccionP : declaracion PUNTOYCOMA instruccionP
-    				| llamada PUNTOYCOMA instruccionP
-				    | asignacion PUNTOYCOMA instruccionP
-				    | condicion instruccionP
-				    | ciclo instruccionP
+def p_instruccion(p):
+    '''instruccion : declaracion PUNTOYCOMA instruccion
+    				| llamada PUNTOYCOMA instruccion
+				    | asignacion PUNTOYCOMA instruccion
+				    | condicion instruccion
+				    | ciclo instruccion
 				    | empty'''
-    print("instruccion_P")
 
-def p_funcion(t):
+def p_funcion(p):
     'funcion : FUNC funcionP'
-    print("funcion")
-def p_funcionP(t):
-    '''funcionP : VOID cuerpo_funcion
+def p_funcionP(p):
+	'''funcionP : VOID cuerpo_funcion
                 | tipo cuerpo_funcion REGRESA expresion'''
-    print("funcionP")
+	setFuncionActual('') # Se acabo la funcion
     
-def p_cuerpo_funcion(t):
-    'cuerpo_funcion : ID PAREN_IZQ cfP PAREN_DER LLAVE_IZQ instruccion LLAVE_DER'
-    print("cuerpo_funcion")
-def p_cfP(t):
-    '''cfP : tipo ID cfPP
-    | empty'''
-    print("cfP")
-
-def p_cfPP(t):
-	'''cfPP : COMA cfPPP
-    		| empty'''
-	print("cfPP")
-
-def p_cfPPP(t):
-	'''cfPPP : cfP
-    		| ID cfPP'''
-	print("cfPPP")
+def p_cuerpo_funcion(p):
+    'cuerpo_funcion : ID NP2_NombreFunc PAREN_IZQ parametro PAREN_DER LLAVE_IZQ instruccion LLAVE_DER'
+def p_parametro(p):
+    '''parametro : tipo ID NP3_Parametros otroParametro
+				| empty'''
+def p_otroParametro(p):
+	'''otroParametro : COMA parametro otroParametro
+    				| empty'''
     
-def p_declaracion(t):
+def p_declaracion(p):
     'declaracion : tipo declaracionP'
-    print("declaracion")
-def p_declaracionP(t):
-    'declaracionP : ID declaracionPPP declaracionPP'
-    print("declaracionP")
-def p_declaracionPP(t):
+def p_declaracionP(p):
+    'declaracionP : ID NP4_Variable declaracionPPP declaracionPP'
+def p_declaracionPP(p):
 	'''declaracionPP : COMA declaracionP
     					| empty'''
-	print("declaracionPP")
-def p_declaracionPPP(t):
+def p_declaracionPPP(p):
 	'''declaracionPPP : ASIGNACION expresion
-    					| declaracion_lista
+    					| declaracion_lista NP6_Lista
     					| empty'''
-	print("declaracionPPP")
     
-# Se cambio la declaracion de lista
-def p_declaracion_lista(t):
+# MODIFICACION: Se cambio la declaracion de lista
+def p_declaracion_lista(p):
 	'''declaracion_lista : ASIGNACION lista
-    					| CORCHETE_IZQ expresion CORCHETE_DER'''
-	print("declaracion_lista")
+    					| CORCHETE_IZQ CTE_INT CORCHETE_DER'''
+	p[0] = p[2]
     
-# Se cambio la asignacion a una lista
-def p_asignacion(t):
+# MODIFICION: Se cambio la asignacion a una lista
+def p_asignacion(p):
     'asignacion : ID asignacionP ASIGNACION expresion'
-    print("asignacion")
-def p_asignacionP(t):
+def p_asignacionP(p):
 	'''asignacionP : CORCHETE_IZQ expresion CORCHETE_DER
     				| empty'''
-	print("asignacionP")
 
-def p_condicion(t):
+def p_condicion(p):
     'condicion : SI PAREN_IZQ expresion PAREN_DER LLAVE_IZQ instruccion LLAVE_DER condicionP'
-    print("condicion")
-def p_condicionP(t):
+def p_condicionP(p):
 	'''condicionP : SINO condicionPP
     				| empty'''
-	print("condicionP")
-def p_condicionPP(t):
+def p_condicionPP(p):
 	'''condicionPP : LLAVE_IZQ instruccion LLAVE_DER
     				| condicion'''
-	print("condicionPP")
 
 # MODIFICACION: repetir puede usar una variable entera o una constante entera
-def p_ciclo(t):
+def p_ciclo(p):
 	'''ciclo : MIENTRAS PAREN_IZQ expresion PAREN_DER LLAVE_IZQ instruccion LLAVE_DER
                 | REPETIR repetir LLAVE_IZQ instruccion LLAVE_DER'''
-	print("ciclo")
-def p_repetir(t):
-	'''repetir : CTE_INT
-    			| ID'''
-	print("repetir")
+def p_repetir(p):
+	'''repetir : expresion'''
 
-def p_llamada(t):
-	'''llamada : funcionEsp
+def p_llamada(p):
+	'''llamada : funcionEspecial
 				| ID LLAVE_IZQ llamadaP LLAVE_DER'''
-	print("llamada")
-def p_llamadaP(t):
+def p_llamadaP(p):
 	'''llamadaP : expresion llamadaPP
     			| empty'''
-	print("llamadaP")
-def p_llamadaPP(t):
+def p_llamadaPP(p):
 	'''llamadaPP : COMA llamadaP
     			| empty'''
-	print("llamadaPPP")
     
-def p_expresion(t):
+def p_expresion(p):
 	'expresion : subExp expresionP'
-	print("expresion")
-def p_expresionP(t):
+def p_expresionP(p):
 	'''expresionP : OP_Y expresion
 					| OP_O expresion
 					| empty'''
-	print("expresionP")
     
-def p_subExp(t):
+def p_subExp(p):
 	'subExp : subExpP exp subExpPP'
-	print("subExp")
-def p_subExpP(t):
+def p_subExpP(p):
 	'''subExpP : NEGACION
 				| empty'''
-	print("subExpP")
-def p_subExpPP(t):
+def p_subExpPP(p):
 	'''subExpPP : comparador exp
     			| empty'''
-	print("subExpPP")
     
-def p_exp(t):
+def p_exp(p):
 	'exp : termino expP'
-	print("exp")
-def p_expP(t):
+def p_expP(p):
 	'''expP : MAS termino
     		| MENOS termino
     		| empty'''
-	print("expP")
 
-def p_termino(t):
+def p_termino(p):
 	'termino : factor terminoP'
-	print("termino")
-def p_terminoP(t):
+def p_terminoP(p):
 	'''terminoP : MULTI termino
     			| DIV termino
     			| RESIDUO termino
 				| empty'''
-	print("terminoP")
     
-def p_comparador(t):
+def p_comparador(p):
 	'''comparador :   MENOR
     				| MAYOR
     				| IGUAL
     				| DIFERENTE
     				| MENOR_IGUAL
     				| MAYOR_IGUAL'''
-	print("comparador")
     
-def p_constante(t):
+def p_constante(p):
 	'''constante :    NULO
     				| CTE_INT
     				| CTE_DEC
     				| CTE_STRING
     				| boolean'''
-	print("constante")
     
-def p_factor(t):
+def p_factor(p):
 	'''factor : PAREN_IZQ expresion PAREN_DER
     			| opAritmetico valor'''
-	print("factor")
-def p_opAritmetico(t):
+def p_opAritmetico(p):
 	'''opAritmetico : MAS
     				| MENOS
     				| empty'''
-	print("opAritmetico")
     
-def p_lista(t):
-	'lista : CORCHETE_IZQ constante listaP CORCHETE_DER'
-	print("lista")
-def p_listaP(t):
-	'''listaP :   COMA constante listaP
+def p_lista(p):
+	'lista : CORCHETE_IZQ listaVacia CORCHETE_DER'
+	p[0] = getTamanoActual()
+def p_listaP(p):
+	'''listaP :   COMA expresion listaP
     			| empty'''
-	print("listaP")
+	setTamanoActual(getTamanoActual()+1)
+def p_listaVacia(p):
+	'''listaVacia : expresion listaP
+				| empty'''
 
-def p_valor(t):
+def p_valor(p):
 	'''valor :    llamada
     			| ID
     			| constante'''
-	print("valor")
 
-def p_tipo(t):
+def p_tipo(p):
 	'''tipo : VAR_INT
 			| VAR_DEC
 			| VAR_STRING
 			| VAR_BOOL'''
-	if t[1] == 'int':
-		print("tipo INT")
-	elif t[1] == 'dec':
-		print("tipo DEC")
-	elif t[1] == 'string':
-		print("tipo STRING")
-	elif t[1] == 'boolean':
-		print("tipo BOOLEAN")
+	# if t[1] == 'int':
+	# 	print("tipo INT")
+	# elif t[1] == 'dec':
+	# 	print("tipo DEC")
+	# elif t[1] == 'string':
+	# 	print("tipo STRING")
+	# elif t[1] == 'boolean':
+	# 	print("tipo BOOLEAN")
+	p[0] = p[1]
+	setTipoActual(p[1])
     
-def p_boolean(t):
+def p_boolean(p):
 	'''boolean :  VERDADERO
     			| FALSO'''
-	print("boolean")
-    
+
     
 # Funciones especiales
-def p_colocarObjeto(t):
-	'colocarObjeto : COLOCAR PAREN_IZQ expresion COMA expresion COMA expresion PAREN_DER'
-   
-def p_mover(t):
-	'mover : MOVER PAREN_IZQ expresion PAREN_DER'
-    
-def p_rotar(t):
-	'rotar : ROTAR PAREN_IZQ expresion PAREN_DER'
-    
-def p_girarDerecha(t):
-	'girarDerecha : GIRAR_DER PAREN_IZQ PAREN_DER'
-    
-def p_girarIzquierda(t):
-	'girarIzquierda : GIRAR_IZQ PAREN_IZQ PAREN_DER'
-    
-def p_caminoLibre(t):
-	'caminoLibre : CAMINO_LIBRE PAREN_IZQ PAREN_DER'
-    
-def p_deteccion(t):
-	'deteccion : DETECCION PAREN_IZQ PAREN_DER'
-    
-def p_ocultar(t):
-	'ocultar : OCULTAR PAREN_IZQ expresion PAREN_DER'
-    
-def p_posicion(t):
-	'posicion : POSICION PAREN_IZQ expresion COMA expresion PAREN_DER'
-    
-def p_mapaCuadricula(t):
-	'mapaCuadricula : MAPA_CUAD PAREN_IZQ expresion PAREN_DER'
-    
-def p_recogerObjeto(t):
-	'recogerObjeto : RECOGER_OBJ PAREN_IZQ PAREN_DER'
-    
-def p_dejarObjeto(t):
-	'dejarObjeto : DEJAR_OBJ PAREN_IZQ PAREN_DER'
-    
-def p_saltar(t):
-	'saltar : SALTAR PAREN_IZQ PAREN_DER'
-    
-def p_matarEnemigo(t):
-	'matarEnemigo : MATAR_ENEMY PAREN_IZQ PAREN_DER'
-    
-def p_color(t):
-	'color : COLOR PAREN_IZQ expresion PAREN_DER'
-    
-def p_trazo(t):
-	'trazo : TRAZO PAREN_IZQ expresion COMA expresion PAREN_DER'
-    
-def p_leer(t):
-	'leer : LEER PAREN_IZQ leerP PAREN_DER'
-def p_leerP(t):
+def p_funcionEspecial(p):
+	'''funcionEspecial : COLOCAR PAREN_IZQ expresion COMA expresion COMA expresion PAREN_DER
+						| MOVER PAREN_IZQ expresion PAREN_DER
+						| ROTAR PAREN_IZQ expresion PAREN_DER
+						| GIRAR_DER PAREN_IZQ PAREN_DER
+						| GIRAR_IZQ PAREN_IZQ PAREN_DER
+						| CAMINO_LIBRE PAREN_IZQ PAREN_DER
+						| DETECCION PAREN_IZQ PAREN_DER
+						| OCULTAR PAREN_IZQ expresion PAREN_DER
+						| POSICION PAREN_IZQ expresion COMA expresion PAREN_DER
+						| MAPA_CUAD PAREN_IZQ expresion PAREN_DER
+						| RECOGER_OBJ PAREN_IZQ PAREN_DER
+						| DEJAR_OBJ PAREN_IZQ PAREN_DER
+						| SALTAR PAREN_IZQ PAREN_DER
+						| MATAR_ENEMY PAREN_IZQ PAREN_DER
+						| COLOR PAREN_IZQ expresion PAREN_DER
+						| TRAZO PAREN_IZQ expresion COMA expresion PAREN_DER
+						| LEER PAREN_IZQ leerP PAREN_DER
+						| ESCRIBIR PAREN_IZQ expresion PAREN_DER
+						| MOSTRAR_VALOR PAREN_IZQ expresion PAREN_DER
+						| FIN PAREN_IZQ PAREN_DER
+						'''
+
+def p_leerP(p):
 	'''leerP : expresion
     			| empty'''
     
-def p_escribir(t):
-	'escribir : ESCRIBIR PAREN_IZQ expresion PAREN_DER'
-    
-def p_mostrarValor(t):
-	'mostrarValor : MOSTRAR_VALOR PAREN_IZQ expresion PAREN_DER'
-    
-def p_fin(t):
-	'fin : FIN PAREN_IZQ PAREN_DER'
-    
-def p_funcionEsp(t):
-	'''funcionEsp :   colocarObjeto
-    				| mover
-    				| rotar
-    				| girarDerecha
-    				| girarIzquierda
-                    | caminoLibre
-                    | deteccion
-                    | ocultar
-                    | posicion
-                    | mapaCuadricula
-                    | recogerObjeto
-                    | dejarObjeto
-                    | saltar
-                    | matarEnemigo
-                    | color
-                    | trazo
-                    | leer
-                    | escribir
-                    | mostrarValor
-                    | fin'''
-	print("funcionEsp")
-    
 # Vacio (epsilon)
-def p_empty(t):
+def p_empty(p):
     'empty :'
-    print("vacio")
     pass
 
 # Error de sintaxis 
-def p_error(t):
+def p_error(p):
     global bCorrecto
     bCorrecto = False
-    print("Error de sintaxis en '", t.value, "' en la linea ", str(t.lineno))
+    print("Error de sintaxis en '", p.value, "' en la linea ", str(p.lineno))
     sys.exit()
 
 # Creacion del parser
@@ -441,7 +232,7 @@ nombreArchivo = input("Nombre del archivo: ")
 archivo = open(nombreArchivo, 'r')
 contenidoArch = archivo.read()
 resultado = parser.parse(contenidoArch)
-print(resultado)
+#print(resultado)
 
 # Notificar si el archivo esta correcto o no
 if bCorrecto == True:

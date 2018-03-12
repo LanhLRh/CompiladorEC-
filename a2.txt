@@ -1,4 +1,4 @@
-func void hola()
+func void hola(int x)
 {
     int x;
     x = 3;
@@ -7,6 +7,7 @@ func void hola()
 # Hola
 inicio
 {
+    int x = [];
     posicion(0,0);
     trazo(verdadero, 1); 
     color("negro");
