@@ -2,7 +2,6 @@
 import ply.yacc as yacc
 from Tokens import tokens
 from SemanticaEC import *
-import Stack
 
 # Bandera que indica si esta correcta la entrada
 bCorrecto = True
@@ -27,7 +26,8 @@ def p_instruccion(p):
 				    | empty'''
 
 def p_funcion(p):
-    'funcion : FUNC funcionP'
+	'funcion : FUNC funcionP'
+	crearCuadruplo(code["finProc"], None, None, None)
 def p_funcionP(p):
 	'''funcionP : VOID cuerpo_funcion
                 | tipo cuerpo_funcion REGRESA expresion'''
@@ -43,14 +43,14 @@ def p_otroParametro(p):
     				| empty'''
     
 def p_declaracion(p):
-    'declaracion : tipo declaracionP'
+	'declaracion : tipo declaracionP'
 def p_declaracionP(p):
     'declaracionP : ID NP4_Variable declaracionPPP declaracionPP'
 def p_declaracionPP(p):
 	'''declaracionPP : COMA declaracionP
     					| empty'''
 def p_declaracionPPP(p):
-	'''declaracionPPP : ASIGNACION expresion
+	'''declaracionPPP : ASIGNACION NP_VariableAPila expresion NP_Asignacion
     					| declaracion_lista NP6_Lista
     					| empty'''
     
@@ -62,67 +62,74 @@ def p_declaracion_lista(p):
     
 # MODIFICION: Se cambio la asignacion a una lista
 def p_asignacion(p):
-    'asignacion : ID asignacionP ASIGNACION expresion'
+    'asignacion : ID asignacionP ASIGNACION NP_VariableAPila expresion NP_Asignacion'
 def p_asignacionP(p):
 	'''asignacionP : CORCHETE_IZQ expresion CORCHETE_DER
     				| empty'''
 
 def p_condicion(p):
-    'condicion : SI PAREN_IZQ expresion PAREN_DER LLAVE_IZQ instruccion LLAVE_DER condicionP'
+    'condicion : SI PAREN_IZQ expresion PAREN_DER NP_Si_Expresion LLAVE_IZQ instruccion LLAVE_DER condicionP'
 def p_condicionP(p):
-	'''condicionP : SINO condicionPP
+	'''condicionP : SINO NP_Sino condicionPP
     				| empty'''
 def p_condicionPP(p):
-	'''condicionPP : LLAVE_IZQ instruccion LLAVE_DER
+	'''condicionPP : LLAVE_IZQ instruccion LLAVE_DER NP_Si_Cierre
     				| condicion'''
 
 # MODIFICACION: repetir puede usar una variable entera o una constante entera
 def p_ciclo(p):
-	'''ciclo : MIENTRAS PAREN_IZQ expresion PAREN_DER LLAVE_IZQ instruccion LLAVE_DER
-                | REPETIR repetir LLAVE_IZQ instruccion LLAVE_DER'''
-def p_repetir(p):
-	'''repetir : expresion'''
+	'''ciclo : MIENTRAS NP_Ciclo_Inicio PAREN_IZQ expresion NP_Ciclo PAREN_DER LLAVE_IZQ instruccion LLAVE_DER NP_Ciclo_Cierre
+             | REPETIR NP_Ciclo_Inicio expresion NP_Ciclo LLAVE_IZQ instruccion LLAVE_DER NP_Ciclo_Cierre'''
 
 def p_llamada(p):
 	'''llamada : funcionEspecial
 				| ID LLAVE_IZQ llamadaP LLAVE_DER'''
 def p_llamadaP(p):
-	'''llamadaP : expresion llamadaPP
+	'''llamadaP : expresion NP_Argumento llamadaPP
     			| empty'''
 def p_llamadaPP(p):
 	'''llamadaPP : COMA llamadaP
     			| empty'''
     
 def p_expresion(p):
-	'expresion : subExp expresionP'
+	'expresion : subExp NP_OpLogicosPendientes NP_OpLogicosPendientes expresionP'
 def p_expresionP(p):
-	'''expresionP : OP_Y expresion
-					| OP_O expresion
-					| empty'''
+	'''expresionP : opLogico expresion
+				  | empty'''
+def p_opLogico(p):
+	'''opLogico : OP_Y 
+				| OP_O'''
+	pushPilaOperadores(p[1])
     
 def p_subExp(p):
-	'subExp : subExpP exp subExpPP'
+	'subExp : subExpP exp NP_OpRelacionalesPendientes subExpPP'
 def p_subExpP(p):
 	'''subExpP : NEGACION
 				| empty'''
 def p_subExpPP(p):
-	'''subExpPP : comparador exp
+	'''subExpPP : comparador subExp
     			| empty'''
     
 def p_exp(p):
-	'exp : termino expP'
-def p_expP(p):
-	'''expP : MAS termino
-    		| MENOS termino
-    		| empty'''
+	'exp : termino NP_SumResPendientes otroExp'
+def p_otroExp(p):
+	'''otroExp : opAritmetico exp
+    			| empty'''
+def p_opAritmetico(p):
+	'''opAritmetico : MAS
+    				| MENOS'''
+	pushPilaOperadores(p[1])
 
 def p_termino(p):
-	'termino : factor terminoP'
+	'termino : factor NP_MulDivResPendientes terminoP'
 def p_terminoP(p):
-	'''terminoP : MULTI termino
-    			| DIV termino
-    			| RESIDUO termino
+	'''terminoP : opMulDivRes termino
 				| empty'''
+def p_opMulDivRes(p):
+	'''opMulDivRes :  MULTI
+    				| DIV 
+    				| RESIDUO'''
+	pushPilaOperadores(p[1])
     
 def p_comparador(p):
 	'''comparador :   MENOR
@@ -131,21 +138,18 @@ def p_comparador(p):
     				| DIFERENTE
     				| MENOR_IGUAL
     				| MAYOR_IGUAL'''
+	pushPilaOperadores(p[1])
     
 def p_constante(p):
-	'''constante :    NULO
-    				| CTE_INT
-    				| CTE_DEC
-    				| CTE_STRING
-    				| boolean'''
+	'''constante : NULO
+				 | CTE_INT NP_IntCTE
+				 | CTE_DEC NP_DecimalCTE
+				 | CTE_STRING NP_StringCTE
+				 | boolean'''
     
 def p_factor(p):
-	'''factor : PAREN_IZQ expresion PAREN_DER
-    			| opAritmetico valor'''
-def p_opAritmetico(p):
-	'''opAritmetico : MAS
-    				| MENOS
-    				| empty'''
+	'''factor : PAREN_IZQ NP_AgrupacionAbre expresion PAREN_DER NP_AgrupacionCierra
+    			| valor'''
     
 def p_lista(p):
 	'lista : CORCHETE_IZQ listaVacia CORCHETE_DER'
@@ -160,7 +164,7 @@ def p_listaVacia(p):
 
 def p_valor(p):
 	'''valor :    llamada
-    			| ID
+    			| identificador
     			| constante'''
 
 def p_tipo(p):
@@ -168,44 +172,41 @@ def p_tipo(p):
 			| VAR_DEC
 			| VAR_STRING
 			| VAR_BOOL'''
-	# if t[1] == 'int':
-	# 	print("tipo INT")
-	# elif t[1] == 'dec':
-	# 	print("tipo DEC")
-	# elif t[1] == 'string':
-	# 	print("tipo STRING")
-	# elif t[1] == 'boolean':
-	# 	print("tipo BOOLEAN")
 	p[0] = p[1]
 	setTipoActual(p[1])
     
 def p_boolean(p):
 	'''boolean :  VERDADERO
     			| FALSO'''
+	nuevaBoolCTE(p[1])
 
-    
+def p_identificar(p):
+	'identificador : ID'
+	validarIDSemantica(p[1])
+	p[0] = p[1]
+
 # Funciones especiales
 def p_funcionEspecial(p):
-	'''funcionEspecial : COLOCAR PAREN_IZQ expresion COMA expresion COMA expresion PAREN_DER
-						| MOVER PAREN_IZQ expresion PAREN_DER
-						| ROTAR PAREN_IZQ expresion PAREN_DER
-						| GIRAR_DER PAREN_IZQ PAREN_DER
-						| GIRAR_IZQ PAREN_IZQ PAREN_DER
-						| CAMINO_LIBRE PAREN_IZQ PAREN_DER
-						| DETECCION PAREN_IZQ PAREN_DER
-						| OCULTAR PAREN_IZQ expresion PAREN_DER
-						| POSICION PAREN_IZQ expresion COMA expresion PAREN_DER
-						| MAPA_CUAD PAREN_IZQ expresion PAREN_DER
-						| RECOGER_OBJ PAREN_IZQ PAREN_DER
-						| DEJAR_OBJ PAREN_IZQ PAREN_DER
-						| SALTAR PAREN_IZQ PAREN_DER
-						| MATAR_ENEMY PAREN_IZQ PAREN_DER
-						| COLOR PAREN_IZQ expresion PAREN_DER
-						| TRAZO PAREN_IZQ expresion COMA expresion PAREN_DER
-						| LEER PAREN_IZQ leerP PAREN_DER
-						| ESCRIBIR PAREN_IZQ expresion PAREN_DER
-						| MOSTRAR_VALOR PAREN_IZQ expresion PAREN_DER
-						| FIN PAREN_IZQ PAREN_DER
+	'''funcionEspecial : COLOCAR PAREN_IZQ expresion NP_FuncUnArg COMA expresion NP_FuncOtroArg1 COMA expresion NP_FuncOtroArg2 PAREN_DER
+						| MOVER PAREN_IZQ expresion NP_FuncUnArg PAREN_DER
+						| ROTAR PAREN_IZQ expresion NP_FuncUnArg PAREN_DER
+						| GIRAR_DER PAREN_IZQ PAREN_DER NP_FuncSinArgs
+						| GIRAR_IZQ PAREN_IZQ PAREN_DER NP_FuncSinArgs
+						| CAMINO_LIBRE PAREN_IZQ PAREN_DER NP_FuncSinArgs
+						| DETECCION PAREN_IZQ PAREN_DER NP_FuncSinArgs
+						| OCULTAR PAREN_IZQ expresion NP_FuncUnArg PAREN_DER
+						| POSICION PAREN_IZQ expresion NP_FuncUnArg COMA expresion NP_FuncOtroArg1 PAREN_DER
+						| MAPA_CUAD PAREN_IZQ expresion NP_FuncUnArg PAREN_DER
+						| RECOGER_OBJ PAREN_IZQ PAREN_DER NP_FuncSinArgs
+						| DEJAR_OBJ PAREN_IZQ PAREN_DER NP_FuncSinArgs
+						| SALTAR PAREN_IZQ PAREN_DER NP_FuncSinArgs
+						| MATAR_ENEMY PAREN_IZQ PAREN_DER NP_FuncSinArgs
+						| COLOR PAREN_IZQ expresion NP_FuncUnArg PAREN_DER
+						| TRAZO PAREN_IZQ expresion NP_FuncUnArg COMA expresion NP_FuncOtroArg1 PAREN_DER
+						| LEER PAREN_IZQ leerP PAREN_DER NP_LeerSinArgs
+						| ESCRIBIR PAREN_IZQ expresion NP_FuncUnArg PAREN_DER
+						| MOSTRAR_VALOR PAREN_IZQ expresion NP_FuncUnArg PAREN_DER
+						| FIN PAREN_IZQ PAREN_DER NP_FuncSinArgs
 						'''
 
 def p_leerP(p):
@@ -221,7 +222,7 @@ def p_empty(p):
 def p_error(p):
     global bCorrecto
     bCorrecto = False
-    print("Error de sintaxis en '", p.value, "' en la linea ", str(p.lineno))
+    print("Error de sintaxis en '" + str(p.value) + "' en la linea ", str(p.lineno))
     sys.exit()
 
 # Creacion del parser
@@ -235,9 +236,7 @@ resultado = parser.parse(contenidoArch)
 #print(resultado)
 
 # Notificar si el archivo esta correcto o no
-if bCorrecto == True:
-    print("Archivo correcto")
-else: 
-    print("Archivo incorrecto")
+if bCorrecto == True: print("Archivo correcto")
+else: print("Archivo incorrecto")
 input()
 sys.exit()

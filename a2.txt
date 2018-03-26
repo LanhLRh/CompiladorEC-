@@ -1,22 +1,32 @@
 func void hola(int x)
 {
-    int x;
-    x = 3;
+    int y;
+    y = -3;
+    dec z = 6;
+    string www = "Hola";
+    int uuu;
+    boolean ver;
+    boolean sas = 1 > 2 * 1/2 * (2);
+    boolean sas1 = verdadero;
+    boolean sas2 = verdadero;
+    int i, w;
+    w = i + 2 + 2/3;
+    #regresa y;
 }
 
-# Hola
+# Esto es un comentario
 inicio
 {
-    int x = [];
+    #int x = [];
     posicion(0,0);
-    trazo(verdadero, 1); 
+    # trazo(verdadero, 1); 
     color("negro");
     
     int contador;
     contador = 2;
     int grados = 2;
 
-    mientras (contador < 13)
+    mientras (contador <= 13)
     {
         mover(20);
         girarIzquierda();
@@ -30,16 +40,17 @@ inicio
         rotar(grados);
     }
 
+    int x;
     x = 2; 
 
-    si(1 > 2) {
-        escribir("Hola Crayola");
+    si(1 >= 2) {
+        mostrarValor("Hola Crayola");
     }
     sino si (1 == 2)
     {
-        leer("n");
+        mostrarValor("n");
     }
     sino {
-        leer();
+        mostrarValor("Vacio");
     }
 }

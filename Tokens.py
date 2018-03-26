@@ -1,4 +1,6 @@
 import ply.lex as lex
+from SemanticaEC import setLineaActual
+from SemanticaEC import getLineaActual
 
 # Tokens
 tokens = [
@@ -71,8 +73,8 @@ t_LLAVE_DER = r'\}'
 t_CORCHETE_IZQ = r'\['
 t_CORCHETE_DER = r'\]'
 t_CTE_STRING = r'\"(\\.|[^"])*\"|\"\"'
-t_CTE_INT = r'[0-9]+'
-t_CTE_DEC = r'[0-9]+\.[0-9]+'
+t_CTE_INT = r'\-?[0-9]+'
+t_CTE_DEC = r'\-?[0-9]+\.[0-9]+'
 
 # Tokens + palabras reservadas
 tokens = tokens + list(palabras_reservadas.values())
@@ -93,8 +95,9 @@ def t_COMENTARIO(p):
 
 # Comentarios
 def t_newline(p):
-	r'\n+'
-	p.lexer.lineno += len(p.value)
+    r'\n+'
+    p.lexer.lineno += len(p.value)
+    setLineaActual(getLineaActual() + len(p.value))
 
 # Caracteres invalidos
 def t_error(p):

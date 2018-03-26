@@ -1,13 +1,10 @@
-import numpy
-from Enums import *
-
 class Cuadruplo:
 
     def __init__(self):
-        self.op1 = -1
-        self.op2 = -1
-        self.ope = -1
-        self.r = -1
+        self.op1 = None
+        self.op2 = None
+        self.ope = None
+        self.reg = None
         
-    def fill(self, r):
-        self.r = r
+    def llenar(self, reg):
+        self.reg = reg
