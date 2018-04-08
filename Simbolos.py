@@ -69,7 +69,9 @@ code = {
     'falso': 93,
 
     # Otros
-    'finProc': 100
+    'finProc': 100,
+    'ERA': 101
+    'parametro' : 102
 }
 
 simb = {

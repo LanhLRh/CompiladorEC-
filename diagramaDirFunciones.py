@@ -6,15 +6,18 @@
 #                [nombreVariable]
 #                    ['tipo'] - Tipo de variable
 #                    ['tamano'] - Tamaño de variable
+#                    ['mem'] - Posicion de memoria
 #            ['paramametros']
 #               [numeroParametro]
 #                    ['nombre'] - Nombre del parametro
 #                    ['tipo'] - Tipo del parametro
+#                    ['mem'] - Posicion de memoria
 #            ['retorno'] - Tipo de retorno de la funcion
 #    ['variables']
 #        [nombreVariable]
 #            ['tipo'] - Tipo de variable
 #            ['tamano'] - Tamaño de variable
+#            ['mem'] - Posicion de memoria
 
 
 

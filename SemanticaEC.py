@@ -94,13 +94,24 @@ def p_NP3_Parametros(p):
 	global tipoActual, tamanoActual, numParametros
 	nombreParametro = p[-1] # Guardar nombre del parametro
 
+	tipoParametro = [-2]	
+
 	# Verificar que no se repita el parametro
 	if nombreParametro in dirProcedimientos['funciones'][funcionActual]:
 		finalizar("Linea " + str(lineaActual) + " -> Nombre ya usado por otro parametro")
+
+	if tipoParametro != '&':
+		tipoParametro = 'valor'
+		# Agregar el parametro como variable a su función correspondiente en la tabla
+		dirProcedimientos['funciones'][funcionActual]['variables'][nombreParametro] = {'tipo' : tipoActual, 'mem': getEspacioMemoria(tipoActual, 'Var'), 'tamano' : tamanoActual}
+	else:
+		tipoParametro = 'referencia'
+		# Agregar el parametro como variable a su función correspondiente en la tabla
+		dirProcedimientos['funciones'][funcionActual]['variables'][nombreParametro] = {'tipo' : tipoActual, 'mem': -1, 'tamano' : tamanoActual}
+
 	# Agregar el parametro a su función correspondiente en la tabla
-	dirProcedimientos['funciones'][funcionActual]['parametros'][numParametros] = {'nombre': nombreParametro, 'tipo': tipoActual, 'tamano': tamanoActual}
-	# Agregar el parametro como variable a su función correspondiente en la tabla
-	dirProcedimientos['funciones'][funcionActual]['parametros'][numParametros] = {'nombre' : nombreParametro, 'tipo' : tipoActual, 'mem': getEspacioMemoria(tipoActual, 'Var'), 'tamano' : tamanoActual}
+	dirProcedimientos['funciones'][funcionActual]['parametros'][numParametros] = {'nombre': nombreParametro, 'tipo': tipoActual, 'tamano': tamanoActual, 'tipoParametro': tipoParametro}
+
 
 	numParametros += 1
 
@@ -161,12 +172,19 @@ def p_NP_Argumento(p):
 	#			hashRefTam[argumDir] = dirProcedimientos['funciones'][funcionActual]['variables'][nameVarParam]['tamano']
 	#		else:
 			# Si el parametro es por valor, crear el cuadruplo
-			crearCuadruplo(code['parametros'], argumDir, None, dirVarParam)
+			crearCuadruplo(code['parametro'], argumDir, None, dirVarParam)
 			numParametros += 1
 		else:
 			finalizar("Linea " + str(lineaActual) + " -> Error en los parametros de la función " + funcionActual)
 	else:
 		finalizar("Numero incorrecto de parametros en la funcion " + funcionActual)
+
+def p_NP_ERA(p):
+	'NP_ERA : '
+	global numParametros, funcionActual
+	nombreLlamada = p[-1]
+
+	crearCuadruplo(code['ERA'], nombreLlamada, None, None)
 
 def p_NP_Si_Expresion(p):
 	'NP_Si_Expresion : '

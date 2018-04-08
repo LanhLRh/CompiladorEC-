@@ -36,11 +36,14 @@ def p_funcionP(p):
 def p_cuerpo_funcion(p):
     'cuerpo_funcion : ID NP2_NombreFunc PAREN_IZQ parametro PAREN_DER LLAVE_IZQ instruccion LLAVE_DER'
 def p_parametro(p):
-    '''parametro : tipo ID NP3_Parametros otroParametro
+    '''parametro : tipo tipoParametro ID NP3_Parametros otroParametro
 				| empty'''
 def p_otroParametro(p):
 	'''otroParametro : COMA parametro otroParametro
     				| empty'''
+def p_tipoParametro(p):
+	'''tipoParametro : OP_Y
+						| empty'''
     
 def p_declaracion(p):
 	'declaracion : tipo declaracionP'
@@ -82,8 +85,8 @@ def p_ciclo(p):
              | REPETIR NP_Ciclo_Inicio expresion NP_Ciclo LLAVE_IZQ instruccion LLAVE_DER NP_Ciclo_Cierre'''
 
 def p_llamada(p):
-	'''llamada : funcionEspecial
-				| ID LLAVE_IZQ llamadaP LLAVE_DER'''
+	'''llamada : funcionEspecial 
+				| ID NP_ERA LLAVE_IZQ llamadaP LLAVE_DER'''
 def p_llamadaP(p):
 	'''llamadaP : expresion NP_Argumento llamadaPP
     			| empty'''
@@ -187,26 +190,26 @@ def p_identificar(p):
 
 # Funciones especiales
 def p_funcionEspecial(p):
-	'''funcionEspecial : COLOCAR PAREN_IZQ expresion NP_FuncUnArg COMA expresion NP_FuncOtroArg1 COMA expresion NP_FuncOtroArg2 PAREN_DER
-						| MOVER PAREN_IZQ expresion NP_FuncUnArg PAREN_DER
-						| ROTAR PAREN_IZQ expresion NP_FuncUnArg PAREN_DER
-						| GIRAR_DER PAREN_IZQ PAREN_DER NP_FuncSinArgs
-						| GIRAR_IZQ PAREN_IZQ PAREN_DER NP_FuncSinArgs
-						| CAMINO_LIBRE PAREN_IZQ PAREN_DER NP_FuncSinArgs
-						| DETECCION PAREN_IZQ PAREN_DER NP_FuncSinArgs
-						| OCULTAR PAREN_IZQ expresion NP_FuncUnArg PAREN_DER
-						| POSICION PAREN_IZQ expresion NP_FuncUnArg COMA expresion NP_FuncOtroArg1 PAREN_DER
-						| MAPA_CUAD PAREN_IZQ expresion NP_FuncUnArg PAREN_DER
-						| RECOGER_OBJ PAREN_IZQ PAREN_DER NP_FuncSinArgs
-						| DEJAR_OBJ PAREN_IZQ PAREN_DER NP_FuncSinArgs
-						| SALTAR PAREN_IZQ PAREN_DER NP_FuncSinArgs
-						| MATAR_ENEMY PAREN_IZQ PAREN_DER NP_FuncSinArgs
-						| COLOR PAREN_IZQ expresion NP_FuncUnArg PAREN_DER
-						| TRAZO PAREN_IZQ expresion NP_FuncUnArg COMA expresion NP_FuncOtroArg1 PAREN_DER
-						| LEER PAREN_IZQ leerP PAREN_DER NP_LeerSinArgs
-						| ESCRIBIR PAREN_IZQ expresion NP_FuncUnArg PAREN_DER
-						| MOSTRAR_VALOR PAREN_IZQ expresion NP_FuncUnArg PAREN_DER
-						| FIN PAREN_IZQ PAREN_DER NP_FuncSinArgs
+	'''funcionEspecial : COLOCAR NP_ERA PAREN_IZQ expresion NP_FuncUnArg COMA expresion NP_FuncOtroArg1 COMA expresion NP_FuncOtroArg2 PAREN_DER
+						| MOVER NP_ERA PAREN_IZQ expresion NP_FuncUnArg PAREN_DER
+						| ROTAR NP_ERA PAREN_IZQ expresion NP_FuncUnArg PAREN_DER
+						| GIRAR_DER NP_ERA PAREN_IZQ PAREN_DER NP_FuncSinArgs
+						| GIRAR_IZQ NP_ERA PAREN_IZQ PAREN_DER NP_FuncSinArgs
+						| CAMINO_LIBRE NP_ERA PAREN_IZQ PAREN_DER NP_FuncSinArgs
+						| DETECCION NP_ERA PAREN_IZQ PAREN_DER NP_FuncSinArgs
+						| OCULTAR NP_ERA PAREN_IZQ expresion NP_FuncUnArg PAREN_DER
+						| POSICION NP_ERA PAREN_IZQ expresion NP_FuncUnArg COMA expresion NP_FuncOtroArg1 PAREN_DER
+						| MAPA_CUAD NP_ERA PAREN_IZQ expresion NP_FuncUnArg PAREN_DER
+						| RECOGER_OBJ NP_ERA PAREN_IZQ PAREN_DER NP_FuncSinArgs
+						| DEJAR_OBJ NP_ERA PAREN_IZQ PAREN_DER NP_FuncSinArgs
+						| SALTAR NP_ERA PAREN_IZQ PAREN_DER NP_FuncSinArgs
+						| MATAR_ENEMY NP_ERA PAREN_IZQ PAREN_DER NP_FuncSinArgs
+						| COLOR NP_ERA PAREN_IZQ expresion NP_FuncUnArg PAREN_DER
+						| TRAZO NP_ERA PAREN_IZQ expresion NP_FuncUnArg COMA expresion NP_FuncOtroArg1 PAREN_DER
+						| LEER NP_ERA PAREN_IZQ leerP PAREN_DER NP_LeerSinArgs
+						| ESCRIBIR NP_ERA PAREN_IZQ expresion NP_FuncUnArg PAREN_DER
+						| MOSTRAR_VALOR NP_ERA PAREN_IZQ expresion NP_FuncUnArg PAREN_DER
+						| FIN NP_ERA PAREN_IZQ PAREN_DER NP_FuncSinArgs
 						'''
 
 def p_leerP(p):

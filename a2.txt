@@ -1,4 +1,4 @@
-func void hola(int x)
+func void hola(int x, dec yy)
 {
     int y;
     y = -3;
@@ -19,8 +19,10 @@ inicio
 {
     #int x = [];
     posicion(0,0);
-    # trazo(verdadero, 1); 
+    trazo(verdadero, 1);
+    trazo(verdadero, 1);  
     color("negro");
+    hola(2, 3);
     
     int contador;
     contador = 2;
