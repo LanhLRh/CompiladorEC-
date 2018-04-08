@@ -117,13 +117,13 @@ def p_NP3_Parametros(p):
 
 def p_NP4_Variable(p):
 	'NP4_Variable : '
-	global tipoActual, tamanoActual # Tipo actual se actualiza desde la gramatica
+	global funcionActual, tipoActual, tamanoActual # Tipo actual se actualiza desde la gramatica
 	tamanoActual = 0
 	nombreVariable = p[-1] # Nombre de la variable (valor de ID)
 
-	# Comprobar que no sea nombre de variable
-	if existeVariable(nombreVariable):
-		finalizar("Linea " + str(lineaActual) + " -> La variable " + str(nombreVariable) + " ya fue declarada")
+	# Comprobar que la variable no este declarada
+	if funcionActual != '' and nombreVariable in dirProcedimientos['funciones'][funcionActual]['variables']:
+		finalizar("Linea " + str(lineaActual) + " -> La variable '" + str(nombreVariable) + "' ya fue declarada")
  	
 	# Si estamos dentro de una funcion (variable local)
 	if funcionActual != '':
@@ -183,6 +183,7 @@ def p_NP_ERA(p):
 	'NP_ERA : '
 	global numParametros, funcionActual
 	nombreLlamada = p[-1]
+	print("HOLAADSASDAS")
 
 	crearCuadruplo(code['ERA'], nombreLlamada, None, None)
 

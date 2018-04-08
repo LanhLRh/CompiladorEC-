@@ -1,3 +1,6 @@
+int x, y;
+dec xx, xxx, yyy, yy;
+
 func void hola(int x, dec yy)
 {
     int y;
@@ -17,12 +20,14 @@ func void hola(int x, dec yy)
 # Esto es un comentario
 inicio
 {
+    int www;
     #int x = [];
+    hola(2, 3);
     posicion(0,0);
     trazo(verdadero, 1);
     trazo(verdadero, 1);  
     color("negro");
-    hola(2, 3);
+
     
     int contador;
     contador = 2;

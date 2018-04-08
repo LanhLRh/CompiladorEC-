@@ -18,19 +18,33 @@ def p_definicionP(p):
                     | declaracion definicion'''
 
 def p_instruccion(p):
-    '''instruccion : declaracion PUNTOYCOMA instruccion
+    '''instruccion : declaracion instruccion
     				| llamada PUNTOYCOMA instruccion
 				    | asignacion PUNTOYCOMA instruccion
 				    | condicion instruccion
 				    | ciclo instruccion
+					| retorno PUNTOYCOMA instruccion
 				    | empty'''
+
+def p_retorno(p):
+	'retorno : REGRESA expresion'
+
+def p_llamada(p):
+	'''llamada : funcionEspecial 
+				| ID NP_ERA LLAVE_IZQ llamadaP LLAVE_DER'''
+def p_llamadaP(p):
+	'''llamadaP : expresion NP_Argumento llamadaPP
+    			| empty'''
+def p_llamadaPP(p):
+	'''llamadaPP : COMA llamadaP
+    			| empty'''
 
 def p_funcion(p):
 	'funcion : FUNC funcionP'
 	crearCuadruplo(code["finProc"], None, None, None)
 def p_funcionP(p):
 	'''funcionP : VOID cuerpo_funcion
-                | tipo cuerpo_funcion REGRESA expresion'''
+                | tipo cuerpo_funcion'''
 	setFuncionActual('') # Se acabo la funcion
     
 def p_cuerpo_funcion(p):
@@ -46,7 +60,7 @@ def p_tipoParametro(p):
 						| empty'''
     
 def p_declaracion(p):
-	'declaracion : tipo declaracionP'
+	'declaracion : tipo declaracionP PUNTOYCOMA'
 def p_declaracionP(p):
     'declaracionP : ID NP4_Variable declaracionPPP declaracionPP'
 def p_declaracionPP(p):
@@ -83,16 +97,6 @@ def p_condicionPP(p):
 def p_ciclo(p):
 	'''ciclo : MIENTRAS NP_Ciclo_Inicio PAREN_IZQ expresion NP_Ciclo PAREN_DER LLAVE_IZQ instruccion LLAVE_DER NP_Ciclo_Cierre
              | REPETIR NP_Ciclo_Inicio expresion NP_Ciclo LLAVE_IZQ instruccion LLAVE_DER NP_Ciclo_Cierre'''
-
-def p_llamada(p):
-	'''llamada : funcionEspecial 
-				| ID NP_ERA LLAVE_IZQ llamadaP LLAVE_DER'''
-def p_llamadaP(p):
-	'''llamadaP : expresion NP_Argumento llamadaPP
-    			| empty'''
-def p_llamadaPP(p):
-	'''llamadaPP : COMA llamadaP
-    			| empty'''
     
 def p_expresion(p):
 	'expresion : subExp NP_OpLogicosPendientes NP_OpLogicosPendientes expresionP'
@@ -225,7 +229,7 @@ def p_empty(p):
 def p_error(p):
     global bCorrecto
     bCorrecto = False
-    print("Error de sintaxis en '" + str(p.value) + "' en la linea ", str(p.lineno))
+    print("Linea " + str(p.lineno) + " -> Error de sintaxis en '" + str(p.value) + "'")
     sys.exit()
 
 # Creacion del parser
