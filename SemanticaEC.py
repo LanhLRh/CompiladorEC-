@@ -159,17 +159,17 @@ def p_NP_Argumento(p):
 		# Obtener la direccion del argumento
 		argumDir = pilaOperandos.pop()
 		# Obtenemos el nombre declarado del parametro, segun su posicion
-		nameVarParam = dirProcedimientos['funciones'][funcionActual]['parametros'][numParametros]['nombre']
+		nombreParametro = dirProcedimientos['funciones'][funcionActual]['parametros'][numParametros]['nombre']
 
 		# Obtener la direccion asignada a ese parametro para la generacion de cuadruplos
-		dirVarParam = dirProcedimientos['funciones'][funcionActual]['variables'][nameVarParam]['mem']
+		dirVarParam = dirProcedimientos['funciones'][funcionActual]['variables'][nombreParametro]['mem']
 		# Verificar que el argumento sea del mismo tipo que el parametro
 		if cubo.revisar(getTipo(dirVarParam), getTipo(argumDir), code['=']) != 'error':
 
 			# Si el parametro es un arreglo lo enviamos por referencia
-	#		if int(dirProcedimientos['funciones'][funcionActual]['variables'][nameVarParam]['tamano']) > 0:
+	#		if int(dirProcedimientos['funciones'][funcionActual]['variables'][nombreParametro]['tamano']) > 0:
 	#			hashRef[argumDir] = dirVarParam
-	#			hashRefTam[argumDir] = dirProcedimientos['funciones'][funcionActual]['variables'][nameVarParam]['tamano']
+	#			hashRefTam[argumDir] = dirProcedimientos['funciones'][funcionActual]['variables'][nombreParametro]['tamano']
 	#		else:
 			# Si el parametro es por valor, crear el cuadruplo
 			crearCuadruplo(code['parametro'], argumDir, None, dirVarParam)
@@ -404,7 +404,7 @@ def p_NP_FuncSinArgs(p):
 def p_NP_FuncUnArg(p):
 	'NP_FuncUnArg :'
 	global funcionInvocada
-	funcionInvocada = code[p[-3]]
+	funcionInvocada = code[p[-4]]
 	# Crear cuadruplo de la funcion obteniendo su argumento de la pila
 	crearCuadruplo(funcionInvocada, pilaOperandos.pop(), None, None)
 
@@ -412,7 +412,7 @@ def p_NP_FuncUnArg(p):
 def p_NP_FuncOtroArg1(p):
     'NP_FuncOtroArg1 :'
     # Crear cuadruplo de la funcion obteniendo su argumento de la pila
-    crearCuadruplo(code[p[-6]], pilaOperandos.pop(), None, None)
+    crearCuadruplo(code[p[-7]], pilaOperandos.pop(), None, None)
 
 def p_NP_FuncOtroArg2(p):
     'NP_FuncOtroArg2 :'

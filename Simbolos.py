@@ -70,7 +70,7 @@ code = {
 
     # Otros
     'finProc': 100,
-    'ERA': 101
+    'ERA': 101,
     'parametro' : 102
 }
 
