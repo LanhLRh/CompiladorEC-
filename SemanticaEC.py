@@ -54,7 +54,7 @@ def p_NP1_DirProced(p):
 	global dirProcedimientos
 	dirProcedimientos = {'funciones': {}, 'variables': {}}
 
-# Guarda la funcion
+# Proc que guarda las funciones en el directorio de funciones
 def p_NP2_NombreFunc(p):
 	'NP2_NombreFunc : '
 	global numParametros, funcionActual
@@ -77,6 +77,7 @@ def p_NP2_NombreFunc(p):
 	# Agregar funcion al directorio	
 	dirProcedimientos['funciones'][funcionActual] = {'retorno' : tipoFuncion, 'variables' : {}, 'mem': memFunc, 'parametros' : {}}
 
+# Procedimiento que agrega la funcion de inicio al directorio
 def p_NP7_Inicio(p):
 	'NP7_Inicio : '
 	global funcionActual
@@ -89,6 +90,7 @@ def p_NP7_Inicio(p):
 	# Agregar funcion al directorio	
 	dirProcedimientos['funciones']['inicio'] = {'retorno' : 'void', 'variables' : {}, 'parametros' : {}}
 
+# Procedimiento que guarda los parametros de una funcion dentro del directorio
 def p_NP3_Parametros(p):
 	'NP3_Parametros : '
 	global tipoActual, tamanoActual, numParametros
@@ -115,24 +117,28 @@ def p_NP3_Parametros(p):
 
 	numParametros += 1
 
+# Procedimiento que guarda las variables dentro de la tabla de variables
 def p_NP4_Variable(p):
 	'NP4_Variable : '
 	global funcionActual, tipoActual, tamanoActual # Tipo actual se actualiza desde la gramatica
 	tamanoActual = 0
 	nombreVariable = p[-1] # Nombre de la variable (valor de ID)
 
-	# Comprobar que la variable no este declarada
-	if funcionActual != '' and nombreVariable in dirProcedimientos['funciones'][funcionActual]['variables']:
-		finalizar("Linea " + str(lineaActual) + " -> La variable '" + str(nombreVariable) + "' ya fue declarada")
- 	
 	# Si estamos dentro de una funcion (variable local)
 	if funcionActual != '':
+		# Comprobar que la variable no este declarada dentro de la funcion
+		if nombreVariable in dirProcedimientos['funciones'][funcionActual]['variables']:
+			finalizar("Linea " + str(lineaActual) + " -> La variable '" + str(nombreVariable) + "' ya fue declarada")
 		# Se mete la variable al directorio
 		dirProcedimientos['funciones'][funcionActual]['variables'][nombreVariable] = {'tipo': tipoActual, 'tamano': 0, 'mem': getEspacioMemoria(tipoActual, 'Var')}
 	# Si la variable es global
 	else:
+		# Comprobar que la variable no este declarada 
+		if nombreVariable in dirProcedimientos['variables']:
+			finalizar("Linea " + str(lineaActual) + " -> La variable '" + str(nombreVariable) + "' ya fue declarada")
 		dirProcedimientos['variables'][nombreVariable] = {'tipo': tipoActual, 'tamano': 0, 'mem': getEspacioMemoria(tipoActual, 'Global')}
 
+# Procedimiento que guarda las listas en el directorio
 def p_sNP6_Lista(p):
 	'NP6_Lista :'
 	# Obtenemos el tamaño del arreglo
@@ -179,6 +185,7 @@ def p_NP_Argumento(p):
 	else:
 		finalizar("Numero incorrecto de parametros en la funcion " + funcionActual)
 
+# Proc que crea el cuadruplo ERA de una llamada
 def p_NP_ERA(p):
 	'NP_ERA : '
 	global numParametros, funcionActual
@@ -187,6 +194,7 @@ def p_NP_ERA(p):
 
 	crearCuadruplo(code['ERA'], nombreLlamada, None, None)
 
+# Proc que crea los cuadruplos de un condicion
 def p_NP_Si_Expresion(p):
 	'NP_Si_Expresion : '
 	expresionIF = pilaOperandos.pop()
@@ -196,6 +204,7 @@ def p_NP_Si_Expresion(p):
 	else:
 		print("Linea", lineaActual, "-> La expresion del estatuto SI debe ser boolean")
 
+# Proc que crea los cuadruplos de un else
 def p_NP_Sino(p):
 	'NP_Sino : '
 	crearCuadruplo(code['goto'], None, None, None)
@@ -203,15 +212,18 @@ def p_NP_Sino(p):
 	pilaSaltos.append(len(cuadruplos) - 1)
 	cuadruplos[cuadruploFalso].llenar(cuadruploFalso)
 
+# Proc que actualiza el cuadruplo gotof de la condicion
 def p_NP_Si_Cierre(p):
 	'NP_Si_Cierre : '
 	cuadruploFin = pilaSaltos.pop()
 	cuadruplos[cuadruploFin].llenar(len(cuadruplos))
 
+# Proc que guarda la posicion inicial de la condicion de un ciclo
 def p_NP_Ciclo_Inicio(p):
 	'NP_Ciclo_Inicio : '
 	pilaSaltos.append(len(cuadruplos))
 
+# Proc que crea los cuadruplos de un ciclo
 def p_NP_Ciclo(p):
 	'NP_Ciclo : '
 	expresionCiclo = pilaOperandos.pop()
@@ -224,7 +236,8 @@ def p_NP_Ciclo(p):
 		
 	crearCuadruplo(code['gotof'], expresionCiclo, None, None)
 	pilaSaltos.append(len(cuadruplos) - 1)
-			
+
+# Proc que crea el cuadruplo goto de un ciclo
 def p_NP_Ciclo_Cierre(p):
 	'NP_Ciclo_Cierre : '
 	cuadruploFin = pilaSaltos.pop()
@@ -232,7 +245,7 @@ def p_NP_Ciclo_Cierre(p):
 	crearCuadruplo(code['goto'], None, None, retorno)
 	cuadruplos[cuadruploFin].llenar(len(cuadruplos))
 
-# Llamada desde 
+# Proc que crea los cuadruplos de sumas y restas
 def p_NP_SumResPendientes(p):
     'NP_SumResPendientes :'
     # pregunto si tengo sumas o restas pendientes por resolver
@@ -259,7 +272,7 @@ def p_NP_SumResPendientes(p):
         else:
             finalizar("Linea " + str(lineaActual) + " -> Error de tipos")
 
-# Llamada desde 
+# Proc que crea los cuadruplos de multiplicaciones, divisiones y residuos
 def p_NP_MulDivResPendientes(p):
     'NP_MulDivResPendientes :'
     # pregunto si tengo sumas o restas pendientes por resolver
@@ -286,7 +299,7 @@ def p_NP_MulDivResPendientes(p):
         else:
             finalizar("Linea " + str(lineaActual) + " -> Error de tipos")
 
-# Llamada desde 
+# Proc qu crea los cuadruplos de los operadores logicos
 def p_NP_OpLogicosPendientes(p):
     'NP_OpLogicosPendientes :'
     # pregunto si tengo sumas o restas pendientes por resolver
@@ -313,7 +326,7 @@ def p_NP_OpLogicosPendientes(p):
         else:
             finalizar("Linea " + str(lineaActual) + " -> Error de tipo")
 
-# Llamada desde 
+# Proc que crea los cuadruplos de los operadores relacionales
 def p_NP_OpRelacionalesPendientes(p):
     'NP_OpRelacionalesPendientes :'
     # pregunto si tengo sumas o restas pendientes por resolver
