@@ -1,5 +1,9 @@
-dasdasdas
-da
-s
-d
-asd
+func int hola()
+{
+}
+
+inicio
+{
+    int x = 5;
+    hola();
+}

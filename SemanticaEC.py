@@ -185,14 +185,15 @@ def p_NP_Argumento(p):
 	else:
 		finalizar("Numero incorrecto de parametros en la funcion " + funcionActual)
 
-# Proc que crea el cuadruplo ERA de una llamada
-def p_NP_ERA(p):
-	'NP_ERA : '
-	global numParametros, funcionActual
-	nombreLlamada = p[-1]
-	print("HOLAADSASDAS")
-
-	crearCuadruplo(code['ERA'], nombreLlamada, None, None)
+# # Proc que crea el cuadruplo ERA de una llamada
+# def p_NP_ERA(p):
+# 	'NP_ERA : '
+# 	global numParametros, funcionActual
+# 	nombreLlamada = p[-1]
+# 	if nombreLlamada in dirProcedimientos:
+# 		crearCuadruplo(code['ERA'], nombreLlamada, None, None)
+# 	else:
+# 		finalizar("Linea " + str(lineaActual) + " -> La funcion " + nombreLlamada + " no esta declarada")
 
 # Proc que crea los cuadruplos de un condicion
 def p_NP_Si_Expresion(p):
@@ -408,37 +409,19 @@ def p_NP_StringCTE(p):
 	# Agregar a la pila de operadores
     pilaOperandos.append(dirConstantes[p[-1]])
 
-# 
-def p_NP_FuncSinArgs(p):
-    'NP_FuncSinArgs :'
-    # Crear cuadruplo de la funcion
-    crearCuadruplo(code[p[-3]], None, None, None)
+# # 
+# def p_NP_FuncEspSinArg(p):
+#     'NP_FuncSinArgs :'
+#     # Crear cuadruplo de la funcion
+#     crearCuadruplo(code[p[-3]], None, None, None)
 
-# 
-def p_NP_FuncUnArg(p):
-	'NP_FuncUnArg :'
-	global funcionInvocada
-	funcionInvocada = code[p[-4]]
-	# Crear cuadruplo de la funcion obteniendo su argumento de la pila
-	crearCuadruplo(funcionInvocada, pilaOperandos.pop(), None, None)
-
-# 
-def p_NP_FuncOtroArg1(p):
-    'NP_FuncOtroArg1 :'
-    # Crear cuadruplo de la funcion obteniendo su argumento de la pila
-    crearCuadruplo(code[p[-7]], pilaOperandos.pop(), None, None)
-
-def p_NP_FuncOtroArg2(p):
-    'NP_FuncOtroArg2 :'
-    # Crear cuadruplo de la funcion obteniendo su argumento de la pila
-    crearCuadruplo(code[p[-8]], pilaOperandos.pop(), None, None)
-
-# Nueva constante string
-def p_NP_LeerSinArgs(p):
-	'NP_LeerSinArgs :'
-	pass
-    # Crear la direccion de mem si no existe
-    ##crearCuadruplo(code[p[-3]], None, None, None)
+# # 
+# def p_NP_FuncEspConArg(p):
+# 	'NP_FuncUnArg :'
+# 	global funcionInvocada
+# 	funcionInvocada = code[p[-4]]
+# 	# Crear cuadruplo de la funcion obteniendo su argumento de la pila
+# 	crearCuadruplo(funcionInvocada, pilaOperandos.pop(), None, None)
 
 #==============================================================================================
 # Agrega un registro a la memoria

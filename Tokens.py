@@ -5,7 +5,7 @@ from SemanticaEC import getLineaActual
 # Tokens
 tokens = [
     'MAS', 'MENOS', 'MULTI', 'DIV', 'MENOR', 'MAYOR', 'DIFERENTE', 'IGUAL', 'MENOR_IGUAL', 'MAYOR_IGUAL',
-    'ASIGNACION', 'OP_Y', 'OP_O', 'RESIDUO', 'NEGACION',
+    'ASIGNACION', 'OP_Y', 'OP_O', 'RESIDUO', 'NEGACION', 'SIM_LLAMADA',
     'PUNTOYCOMA', 'COMA', 'PAREN_IZQ','PAREN_DER', 'CORCHETE_IZQ', 'CORCHETE_DER',
     'LLAVE_IZQ', 'LLAVE_DER', 'ID', 'CTE_STRING', 'CTE_INT','CTE_DEC'
 ]
@@ -49,6 +49,7 @@ palabras_reservadas = {
 }
 
 # Tokens
+t_SIM_LLAMADA = r'\$'
 t_MAS = r'\+'
 t_MENOS = r'\-'
 t_MULTI = r'\*'
