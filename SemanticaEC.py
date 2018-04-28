@@ -52,17 +52,18 @@ def imprimir():
 def p_NP1_DirProced(p):
 	'NP1_DirProced : '
 	global dirProcedimientos
+	# Inicializar el directorio de procedimientos con los espacios para funciones y variables
 	dirProcedimientos = {'funciones': {}, 'variables': {}}
 
 # Proc que guarda las funciones en el directorio de funciones
 def p_NP2_NombreFunc(p):
 	'NP2_NombreFunc : '
-	global numParametros, funcionActual
-	numParametros = 1
-	resetFuncMems()
+	global numParametros, funcionActual		# Globales
+	numParametros = 1 						# Inicializar el contador de parametros
+	resetFuncMems()							# Reiniciar las temporales
 	# Guardar nombre y tipo de la funcion
-	tipoFuncion = p[-2]
-	funcionActual = p[-1]
+	tipoFuncion = p[-2]						# Tipo de la función
+	funcionActual = p[-1]					# Nombre de la función
 
 	# Comprobar que no sea nombre de una funcion
 	if funcionActual in dirProcedimientos['funciones']:
@@ -84,6 +85,7 @@ def p_NP7_Inicio(p):
 	# Comprobar que no haya otro inicio
 	funcionActual = 'inicio'
 
+	# Comprobar que el inicio no este declarado ya
 	if funcionActual in dirProcedimientos['funciones']:
 		finalizar("Linea " + str(lineaActual) + " -> El inicio ya fue declarado en otra parte")
 
@@ -96,12 +98,13 @@ def p_NP3_Parametros(p):
 	global tipoActual, tamanoActual, numParametros
 	nombreParametro = p[-1] # Guardar nombre del parametro
 
-	tipoParametro = [-2]	
+	tipoParametro = [-2]	# Tipo de parametro
 
 	# Verificar que no se repita el parametro
 	if nombreParametro in dirProcedimientos['funciones'][funcionActual]:
 		finalizar("Linea " + str(lineaActual) + " -> Nombre ya usado por otro parametro")
 
+	# Si el parametro es por valor
 	if tipoParametro != '&':
 		tipoParametro = 'valor'
 		# Agregar el parametro como variable a su función correspondiente en la tabla
@@ -114,15 +117,14 @@ def p_NP3_Parametros(p):
 	# Agregar el parametro a su función correspondiente en la tabla
 	dirProcedimientos['funciones'][funcionActual]['parametros'][numParametros] = {'nombre': nombreParametro, 'tipo': tipoActual, 'tamano': tamanoActual, 'tipoParametro': tipoParametro}
 
-
-	numParametros += 1
+	numParametros += 1		# Aumentar contador de parametros
 
 # Procedimiento que guarda las variables dentro de la tabla de variables
 def p_NP4_Variable(p):
 	'NP4_Variable : '
 	global funcionActual, tipoActual, tamanoActual # Tipo actual se actualiza desde la gramatica
-	tamanoActual = 0
-	nombreVariable = p[-1] # Nombre de la variable (valor de ID)
+	tamanoActual = -1		# Tamaño de la variable		
+	nombreVariable = p[-1]	# Nombre de la variable (valor de ID)
 
 	# Si estamos dentro de una funcion (variable local)
 	if funcionActual != '':
@@ -141,83 +143,96 @@ def p_NP4_Variable(p):
 # Procedimiento que guarda las listas en el directorio
 def p_sNP6_Lista(p):
 	'NP6_Lista :'
-	# Obtenemos el tamaño del arreglo
-	tamanoArreglo = p[-1]
+	tamanoArreglo = p[-1]		# Obtenemos el tamaño del arreglo
 
 	# Si el tamaño es menor a 0
 	if int(tamanoArreglo) < 0:
 		finalizar("Linea " + str(lineaActual) + " -> El tamaño del arreglo debe ser mayor o igual a 0")
 	# Obtenemos el nombre del arreglo, ya fue declarado, solo hay que actualizar el tamano
 	nombreVariable = p[-3]
+	tipoArreglo = tipoActual # Tipo del arreglo
 
 	# Actualizar tamaño de la variable (arreglo)
 	if funcionActual != "":
 		dirProcedimientos['funciones'][funcionActual]['variables'][nombreVariable]['tamano'] = tamanoArreglo
+		# Aumentar numero de registros segun el tamaño del arreglo
+		registrosMem[contadorReg[tipoArreglo + 'Var']] += (int(tamanoArreglo) - 1) 
 	else:
+		# 
 		dirProcedimientos['variables'][nombreVariable]['tamano'] = tamanoArreglo
+		# Aumentar numero de registros segun el tamaño del arreglo
+		registrosMem[contadorReg[tipoArreglo + 'Global']] += (int(tamanoArreglo) - 1)
 
 # Argumentos de llamada de una función
 def p_NP_Argumento(p):
 	'NP_Argumento : '
-	global numParametros
+	global numParametros, funcionInvocada
+
     # Verificamos que el numero de argumentos siga dentro del rango
-	if numParametros in dirProcedimientos['funciones'][funcionActual]['parametros']:
+	if numParametros in dirProcedimientos['funciones'][funcionInvocada]['parametros']:
 		# Obtener la direccion del argumento
 		argumDir = pilaOperandos.pop()
 		# Obtenemos el nombre declarado del parametro, segun su posicion
-		nombreParametro = dirProcedimientos['funciones'][funcionActual]['parametros'][numParametros]['nombre']
+		nombreParametro = dirProcedimientos['funciones'][funcionInvocada]['parametros'][numParametros]['nombre']
 
 		# Obtener la direccion asignada a ese parametro para la generacion de cuadruplos
-		dirVarParam = dirProcedimientos['funciones'][funcionActual]['variables'][nombreParametro]['mem']
+		dirVarParam = dirProcedimientos['funciones'][funcionInvocada]['variables'][nombreParametro]['mem']
 		# Verificar que el argumento sea del mismo tipo que el parametro
 		if cubo.revisar(getTipo(dirVarParam), getTipo(argumDir), code['=']) != 'error':
 
 			# Si el parametro es un arreglo lo enviamos por referencia
-	#		if int(dirProcedimientos['funciones'][funcionActual]['variables'][nombreParametro]['tamano']) > 0:
+	#		if int(dirProcedimientos['funciones'][funcionInvocada]['variables'][nombreParametro]['tamano']) > 0:
 	#			hashRef[argumDir] = dirVarParam
-	#			hashRefTam[argumDir] = dirProcedimientos['funciones'][funcionActual]['variables'][nombreParametro]['tamano']
+	#			hashRefTam[argumDir] = dirProcedimientos['funciones'][funcionInvocada]['variables'][nombreParametro]['tamano']
 	#		else:
 			# Si el parametro es por valor, crear el cuadruplo
 			crearCuadruplo(code['parametro'], argumDir, None, dirVarParam)
 			numParametros += 1
 		else:
-			finalizar("Linea " + str(lineaActual) + " -> Error en los parametros de la función " + funcionActual)
+			finalizar("Linea " + str(lineaActual) + " -> Error en los parametros de la función " + funcionInvocada)
 	else:
-		finalizar("Numero incorrecto de parametros en la funcion " + funcionActual)
+		finalizar("Linea " + str(lineaActual) + " -> Numero incorrecto de parametros en la funcion " + funcionInvocada)
 
-# # Proc que crea el cuadruplo ERA de una llamada
-# def p_NP_ERA(p):
-# 	'NP_ERA : '
-# 	global numParametros, funcionActual
-# 	nombreLlamada = p[-1]
-# 	if nombreLlamada in dirProcedimientos:
-# 		crearCuadruplo(code['ERA'], nombreLlamada, None, None)
-# 	else:
-# 		finalizar("Linea " + str(lineaActual) + " -> La funcion " + nombreLlamada + " no esta declarada")
+# Proc que crea el cuadruplo ERA de una llamada
+def p_NP_ERA(p):
+	'NP_ERA : '
+	global numParametros, funcionInvocada
+	funcionInvocada = p[-1] # Guardar el nombre de la función invocada
+	numParametros = 1       # Inicializar el contador de parametros
+
+	# Comprobar que la función este declarada
+	if funcionInvocada in dirProcedimientos['funciones']:
+		crearCuadruplo(code['ERA'], funcionInvocada, None, None)
+	# Informar que la función no fue declarada
+	else:
+		finalizar("Linea " + str(lineaActual) + " -> La funcion " + funcionInvocada + " no esta declarada")
 
 # Proc que crea los cuadruplos de un condicion
 def p_NP_Si_Expresion(p):
 	'NP_Si_Expresion : '
 	expresionIF = pilaOperandos.pop()
+
+	# Comprobar que dentro del if hay un booleano
 	if getTipo(expresionIF) == code['boolean']: # Revisar
+		# Crear cuadruplo gotof
 		crearCuadruplo(code['gotof'], expresionIF, None, None)
-		pilaSaltos.append(len(cuadruplos) - 1)
+		pilaSaltos.append(len(cuadruplos) - 1) # Guardar la posición del salto
 	else:
 		print("Linea", lineaActual, "-> La expresion del estatuto SI debe ser boolean")
 
 # Proc que crea los cuadruplos de un else
 def p_NP_Sino(p):
 	'NP_Sino : '
-	crearCuadruplo(code['goto'], None, None, None)
-	cuadruploFalso = pilaSaltos.pop()
-	pilaSaltos.append(len(cuadruplos) - 1)
-	cuadruplos[cuadruploFalso].llenar(cuadruploFalso)
+	crearCuadruplo(code['goto'], None, None, None)		# Crear cuadruplo goto del else
+	cuadruploFalso = pilaSaltos.pop() 					# Sacar la posición de el gotof correspondiente al if de este else
+	pilaSaltos.append(len(cuadruplos) - 1)				# Guardar posición del salto
+	cuadruplos[cuadruploFalso].llenar(cuadruploFalso)	# Rellenar cuadruplo gotof correspondiente
 
 # Proc que actualiza el cuadruplo gotof de la condicion
 def p_NP_Si_Cierre(p):
 	'NP_Si_Cierre : '
 	cuadruploFin = pilaSaltos.pop()
-	cuadruplos[cuadruploFin].llenar(len(cuadruplos))
+	cuadruplos[cuadruploFin].llenar(len(cuadruplos))	# Rellenar cuadruplo
 
 # Proc que guarda la posicion inicial de la condicion de un ciclo
 def p_NP_Ciclo_Inicio(p):
@@ -228,15 +243,18 @@ def p_NP_Ciclo_Inicio(p):
 def p_NP_Ciclo(p):
 	'NP_Ciclo : '
 	expresionCiclo = pilaOperandos.pop()
+	# Ciclo repeter
 	if p[-1] == 'repetir':
-		if getTipo(expresionCiclo) != code['int']: # Revisar
+		if getTipo(expresionCiclo) != code['int']: # Revisar que haya un numero para repetir el ciclo
 			finalizar("Linea " + str(lineaActual) + " -> La expresión del estatuto REPETIR debe ser un valor entero")
+	# Ciclo mientras
 	else:
-		if getTipo(expresionCiclo) != code['boolean']: # Revisar
+		if getTipo(expresionCiclo) != code['boolean']:	# Revisar la condición sea booleana
 			finalizar("Linea " + str(lineaActual) + " -> La expresión del estatuto MIENTRAS debe ser un boolean")
 		
+	# Crear cuadruplo gotof del ciclo
 	crearCuadruplo(code['gotof'], expresionCiclo, None, None)
-	pilaSaltos.append(len(cuadruplos) - 1)
+	pilaSaltos.append(len(cuadruplos) - 1) 				# Guardar la posición del salto
 
 # Proc que crea el cuadruplo goto de un ciclo
 def p_NP_Ciclo_Cierre(p):
@@ -300,7 +318,7 @@ def p_NP_MulDivResPendientes(p):
         else:
             finalizar("Linea " + str(lineaActual) + " -> Error de tipos")
 
-# Proc qu crea los cuadruplos de los operadores logicos
+# Proc que crea los cuadruplos de los operadores logicos
 def p_NP_OpLogicosPendientes(p):
     'NP_OpLogicosPendientes :'
     # pregunto si tengo sumas o restas pendientes por resolver
@@ -382,6 +400,7 @@ def p_NP_AgrupacionCierra(p):
 	if pilaOperadores.pop() != code['(']:
 		finalizar("Linea " + str(lineaActual) + " -> Error en los parentesis")
 
+# Asignación de memoria a CONSTANTES ----------------------------------------------
 # Nueva constante entera
 def p_NP_IntCTE(p):
 	'NP_IntCTE :'
@@ -402,26 +421,35 @@ def p_NP_DecimalCTE(p):
 
 # Nueva constante string
 def p_NP_StringCTE(p):
-    'NP_StringCTE :'
-    # Crear la direccion de mem si no existe
-    if not p[-1] in dirConstantes:
-        registrarReg(p[-1], 'stringCTE')
+	'NP_StringCTE :'
+	# Crear la direccion de mem si no existe
+	if not p[-1] in dirConstantes:
+		registrarReg(p[-1], 'stringCTE')
 	# Agregar a la pila de operadores
-    pilaOperandos.append(dirConstantes[p[-1]])
+	pilaOperandos.append(dirConstantes[p[-1]])
+#------------------------------------------------------------------------------------------
 
-# # 
-# def p_NP_FuncEspSinArg(p):
-#     'NP_FuncSinArgs :'
-#     # Crear cuadruplo de la funcion
-#     crearCuadruplo(code[p[-3]], None, None, None)
+# Global que mantiene el nombre de la funcion especial invocada
+funcionEspecial = None
 
-# # 
-# def p_NP_FuncEspConArg(p):
-# 	'NP_FuncUnArg :'
-# 	global funcionInvocada
-# 	funcionInvocada = code[p[-4]]
-# 	# Crear cuadruplo de la funcion obteniendo su argumento de la pila
-# 	crearCuadruplo(funcionInvocada, pilaOperandos.pop(), None, None)
+# Crea el cuadruplo de invocación de una función especial sin parametros
+def p_NP_FuncEsp(p):
+	'NP_FuncEsp :'
+	funcionEspecial = code[p[-1]]
+	# Crear cuadruplo de la funcion
+	crearCuadruplo(funcionEspecial, None, None, None)
+
+# Crea el primer cuadruplo de invocación de una función especial con parametros
+def p_NP_FuncEspParam(p):
+	'NP_FuncEspParam :'
+	global funcionEspecial
+	funcionEspecial = code[p[-1]]
+
+# Crea el cuadruplo de una funcion especial que tiene argumentos
+def p_NP_ArgFunEsp(p):
+	'NP_ArgFunEsp :'
+	# Crear cuadruplo de la funcion obteniendo su argumento de la pila
+	crearCuadruplo(funcionEspecial, pilaOperandos.pop(), None, None)
 
 #==============================================================================================
 # Agrega un registro a la memoria
@@ -502,11 +530,9 @@ def validarIDSemantica(IDNombreActual):
 
 	# Si variable existe, insertarla en la pila de operandos
 	if funcionActual == '' or IDNombreActual in dirProcedimientos['funciones'][funcionActual]['variables']:
-		# las variables locales no tienen privilegios
 		pilaOperandos.append(dirProcedimientos['funciones'][funcionActual]['variables'][IDNombreActual]['mem'])
 
 	elif IDNombreActual in dirProcedimientos['variables']:
-		# Estan siendo utilizadas dentro de su contexto, no ocupo privilegios
 		pilaOperandos.append(dirProcedimientos['variables'][IDNombreActual]['mem'])
 	# Borrar este else
 	else:

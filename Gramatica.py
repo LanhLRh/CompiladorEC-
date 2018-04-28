@@ -19,7 +19,6 @@ def p_definicionP(p):
 
 def p_instruccion(p):
     '''instruccion : declaracion instruccion
-					| ID PAREN_IZQ llamadaP PAREN_DER PUNTOYCOMA instruccion
 				    | asignacion PUNTOYCOMA instruccion
 				    | condicion instruccion
 					| llamada PUNTOYCOMA instruccion
@@ -31,26 +30,27 @@ def p_retorno(p):
 	'retorno : REGRESA expresion'
 
 def p_llamada(p):
-	'''llamada :  COLOCAR PAREN_IZQ expresion COMA expresion COMA expresion PAREN_DER
-				| MOVER PAREN_IZQ expresion PAREN_DER
-				| ROTAR PAREN_IZQ expresion PAREN_DER
-				| GIRAR_DER PAREN_IZQ PAREN_DER
-				| GIRAR_IZQ PAREN_IZQ PAREN_DER
-				| CAMINO_LIBRE PAREN_IZQ PAREN_DER
-				| DETECCION PAREN_IZQ PAREN_DER
-				| OCULTAR PAREN_IZQ expresion PAREN_DER
-				| POSICION PAREN_IZQ expresion COMA expresion PAREN_DER
-				| MAPA_CUAD PAREN_IZQ expresion PAREN_DER
-				| RECOGER_OBJ PAREN_IZQ PAREN_DER
-				| DEJAR_OBJ PAREN_IZQ PAREN_DER
-				| SALTAR PAREN_IZQ PAREN_DER
-				| MATAR_ENEMY PAREN_IZQ PAREN_DER
-				| COLOR PAREN_IZQ expresion PAREN_DER
-				| TRAZO PAREN_IZQ expresion COMA expresion PAREN_DER
-				| LEER PAREN_IZQ leerP PAREN_DER
-				| ESCRIBIR PAREN_IZQ expresion PAREN_DER
-				| MOSTRAR_VALOR PAREN_IZQ expresion PAREN_DER
-				| FIN PAREN_IZQ PAREN_DER'''
+	'''llamada :  COLOCAR NP_FuncEspParam PAREN_IZQ expresion NP_ArgFunEsp COMA expresion NP_ArgFunEsp COMA expresion NP_ArgFunEsp PAREN_DER
+				| MOVER NP_FuncEspParam PAREN_IZQ expresion NP_ArgFunEsp PAREN_DER
+				| ROTAR NP_FuncEspParam PAREN_IZQ expresion NP_ArgFunEsp PAREN_DER
+				| GIRAR_DER NP_FuncEsp PAREN_IZQ PAREN_DER
+				| GIRAR_IZQ NP_FuncEsp PAREN_IZQ PAREN_DER
+				| CAMINO_LIBRE NP_FuncEsp PAREN_IZQ PAREN_DER
+				| DETECCION NP_FuncEsp PAREN_IZQ PAREN_DER
+				| OCULTAR NP_FuncEspParam PAREN_IZQ expresion NP_ArgFunEsp PAREN_DER
+				| POSICION NP_FuncEspParam PAREN_IZQ expresion NP_ArgFunEsp COMA expresion NP_ArgFunEsp PAREN_DER
+				| MAPA_CUAD NP_FuncEspParam PAREN_IZQ expresion NP_ArgFunEsp PAREN_DER
+				| RECOGER_OBJ NP_FuncEsp PAREN_IZQ PAREN_DER
+				| DEJAR_OBJ NP_FuncEsp PAREN_IZQ PAREN_DER
+				| SALTAR NP_FuncEsp PAREN_IZQ PAREN_DER
+				| MATAR_ENEMY NP_FuncEsp PAREN_IZQ PAREN_DER
+				| COLOR NP_FuncEspParam PAREN_IZQ expresion NP_ArgFunEsp PAREN_DER
+				| TRAZO NP_FuncEspParam PAREN_IZQ expresion NP_ArgFunEsp COMA expresion NP_ArgFunEsp PAREN_DER
+				| LEER NP_FuncEsp PAREN_IZQ leerP PAREN_DER
+				| ESCRIBIR NP_FuncEspParam PAREN_IZQ expresion NP_ArgFunEsp PAREN_DER
+				| MOSTRAR_VALOR NP_FuncEspParam PAREN_IZQ expresion NP_ArgFunEsp PAREN_DER
+				| FIN NP_FuncEsp PAREN_IZQ PAREN_DER
+				| ID NP_ERA PAREN_IZQ llamadaP PAREN_DER'''
 def p_llamadaP(p):
 	'''llamadaP : expresion NP_Argumento llamadaPP
     			| empty'''
@@ -60,7 +60,7 @@ def p_llamadaPP(p):
 
 def p_funcion(p):
 	'funcion : FUNC funcionP'
-	crearCuadruplo(code["finProc"], None, None, None)
+	crearCuadruplo(code["finProc"], None, None, None) # Cuadruplo de cierre de función
 def p_funcionP(p):
 	'''funcionP : VOID cuerpo_funcion
                 | tipo cuerpo_funcion'''
@@ -93,7 +93,7 @@ def p_declaracionPPP(p):
 # MODIFICACION: Se cambio la declaracion de lista
 def p_declaracion_lista(p):
 	'''declaracion_lista : ASIGNACION lista
-    					| CORCHETE_IZQ CTE_INT CORCHETE_DER'''
+    					| CORCHETE_IZQ expresion CORCHETE_DER'''
 	p[0] = p[2]
     
 # MODIFICION: Se cambio la asignacion a una lista
