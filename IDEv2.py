@@ -3,7 +3,6 @@ import os
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import QTextOption, QTextCursor, QFontMetrics
 from PyQt5.QtGui import (QColor, QPainter, QFont, QSyntaxHighlighter, QTextFormat, QTextCharFormat)
-import EditorCodigo
 import SintaxisEC
 import Gramatica
 
