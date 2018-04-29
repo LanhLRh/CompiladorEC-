@@ -222,14 +222,20 @@ def p_empty(p):
 
 # Error de sintaxis 
 def p_error(p):
-    global bCorrecto
-    bCorrecto = False
-    print("Linea " + str(p.lineno) + " -> Error de sintaxis en '" + str(p.value) + "'")
-    sys.exit()
+	global bCorrecto
+	bCorrecto = False
+	mensaje = "Linea " + str(p.lineno) + " -> Error de sintaxis en '" + str(p.value) + "'"
+	print(mensaje)
+	file = open("archErroresCompilacion.txt","w") 
+	file.write(mensaje) 
+	file.close()
+	return
+    #sys.exit()
 
 # Creacion del parser
 parser = yacc.yacc()
 
+'''
 # Lectura de archivo
 nombreArchivo = input("Nombre del archivo: ")
 archivo = open(nombreArchivo, 'r')
@@ -241,4 +247,4 @@ resultado = parser.parse(contenidoArch)
 if bCorrecto == True: print("Archivo correcto")
 else: print("Archivo incorrecto")
 input()
-sys.exit()
+'''

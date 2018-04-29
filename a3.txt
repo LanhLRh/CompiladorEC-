@@ -1,9 +1,12 @@
-func int hola()
+func void hola(int x)
 {
+    x = 2;
 }
 
 inicio
 {
     int x = 5;
-    hola();
+    hola(3+3);
+    saltar();
+    escribir(2);
 }

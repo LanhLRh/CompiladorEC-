@@ -42,6 +42,7 @@ def p_imprimir(p):
 	print(pilaOperadores)
 	print(pilaOperandos)
 	imprimir()
+	finalizar("Compilación Exitosa")
 
 def imprimir():
 	for index, cuadruplo in enumerate(cuadruplos):
@@ -459,8 +460,12 @@ def registrarReg(dato, tipo):
 
 # Termina la ejecucion del programa y muestra un mensaje
 def finalizar(mensaje):
-    print(mensaje)
-    sys.exit()
+	print(mensaje)
+	file = open("archErroresCompilacion.txt","w") 
+	file.write(mensaje) 
+	file.close()
+	return
+	#sys.exit()
 
 # Actualiza el el tipo actal de variable
 def setTipoActual(nuevoTipo):
