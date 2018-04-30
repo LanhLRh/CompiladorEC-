@@ -20,31 +20,31 @@ def format(color, estilo=''):
     return _format
 
 
-# Syntax styles that can be shared by all languages
-STYLES = {
+# Estilos de sintaxis
+ESTILOS = {
     'keyword': format([200, 120, 50], 'bold'),
     'operador': format([150, 150, 150]),
     'llave': format('darkGray'),
-    'defclass': format([220, 220, 255], 'bold'),
+    'funcDefini': format([220, 220, 255], 'bold'),
     'string': format([20, 110, 100]),
     'comentario': format([128, 128, 128]),
     'numeros': format([100, 150, 190]),
-    'variables': format([150,120,140])
+    'variables': format([229, 103, 103]),
 }
 
-# Syntax highlighter for the Python language
+# Resaltador de Sintaxis del EC++
 class ResaltadorLineas(QSyntaxHighlighter):
 
     # Palabras clave
     keywords = [
-        'def','repetir', 'si', 'sino',
+        'func','repetir', 'si', 'sino',
         'regresar', 'mientras',
-        'Nulo', 'Verdadero', 'Falso',
+        'Nulo', 'verdadero', 'falso',
     ]
 
     # Variables
     variables = [
-        'int', 'dec', 'string', 'boolean'
+        'int', 'dec', 'string', 'boolean', 'void'
     ]
 
     # Operadores
@@ -69,30 +69,37 @@ class ResaltadorLineas(QSyntaxHighlighter):
         reglas = []
 
         # Reglas de keyword, operadores, variables, llaves
-        reglas += [(r'\b%s\b' % w, 0, STYLES['keyword'])
+        reglas += [(r'\b%s\b' % w, 0, ESTILOS['keyword'])
                   for w in ResaltadorLineas.keywords]
-        reglas += [(r'\b%s\b' % v, 0, STYLES['variables'])
+        reglas += [(r'\b%s\b' % v, 0, ESTILOS['variables'])
                   for v in ResaltadorLineas.variables]                  
-        reglas += [(r'%s' % o, 0, STYLES['operador'])
+        reglas += [(r'%s' % o, 0, ESTILOS['operador'])
                   for o in ResaltadorLineas.operadores]
-        reglas += [(r'%s' % b, 0, STYLES['llave'])
+        reglas += [(r'%s' % b, 0, ESTILOS['llave'])
                   for b in ResaltadorLineas.llaves]
 
         # Demas reglas
         reglas += [
 
             # String (delimitado por doble comilla)
-            (r'"[^"\\]*(\\.[^"\\]*)*"', 0, STYLES['string']),
+            (r'"[^"\\]*(\\.[^"\\]*)*"', 0, ESTILOS['string']),
 
-            # Funcion [def] seguido de un identificador
-            (r'\bdef\b\s*(\w+)', 1, STYLES['defclass']),
+            # Funcion [func] seguido de un identificador
+            (r'\bfunc\b\s*\bvoid\b\s*(\w+)', 1, ESTILOS['funcDefini']),
+            (r'\bfunc\b\s*\bint\b\s*(\w+)', 1, ESTILOS['funcDefini']),
+            (r'\bfunc\b\s*\bdec\b\s*(\w+)', 1, ESTILOS['funcDefini']),
+            (r'\bfunc\b\s*\bstring\b\s*(\w+)', 1, ESTILOS['funcDefini']),
+            (r'\bfunc\b\s*\bboolean\b\s*(\w+)', 1, ESTILOS['funcDefini']),
+
+            # Llamadas a funciones (no funciona bien)
+            #(r'[a-zA-Z]+\([^\)]*\)(\.[^\)]*\))?', 0, ESTILOS['funcDefini']),
 
             # Comentario (inicia con un #)
-            (r'#[^\n]*', 0, STYLES['comentario']),
+            (r'#[^\n]*', 0, ESTILOS['comentario']),
 
             # Numeros
-            (r'\b[+-]?[0-9]+[lL]?\b', 0, STYLES['numeros']),
-            (r'\b[+-]?0[xX][0-9A-Fa-f]+[lL]?\b', 0, STYLES['numeros']),
+            (r'\b[+-]?[0-9]+[lL]?\b', 0, ESTILOS['numeros']),
+            (r'\b[+-]?0[xX][0-9A-Fa-f]+[lL]?\b', 0, ESTILOS['numeros']),
         ]
 
         # Crea un QRegExp para cada patron
@@ -102,7 +109,7 @@ class ResaltadorLineas(QSyntaxHighlighter):
     # Aplica el resaltado de sintaxis al bloque recibido de texto
     def highlightBlock(self, text):
 
-        # Do other syntax formatting
+        # Hacer el resto de formateo de sintaxis
         for expression, nth, format in self.reglas:
             index = expression.indexIn(text, 0)
 
