@@ -3,6 +3,7 @@ import os
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import QTextOption, QTextCursor, QFontMetrics
 from PyQt5.QtGui import (QColor, QPainter, QFont, QSyntaxHighlighter, QTextFormat, QTextCharFormat)
+#import EditorCodigo
 import SintaxisEC
 import Gramatica
 
@@ -70,12 +71,14 @@ def mostrarEnConsola(salida = ""):
 		archivo = open("archErroresCompilacion.txt", "r") 
 		contenidoArch = archivo.read() 
 		ui.txtCmd.insertPlainText(str(numeroLinea) + "> " + contenidoArch + '\n')
-		numeroLinea += 1
 
 		# Mover scrollbar
 		scrollbar.setValue(scrollbar.maximum())
 	else:
+		# Muestra mensaje recibido como parametro
 		ui.txtCmd.insertPlainText(str(numeroLinea) + "> " + salida + '\n')
+
+	numeroLinea += 1	# Aumentar contador
 
 # Muetra un mensaje como ventana emergente
 def mensaje(titulo="Advertencia", mensaje=""):
@@ -124,8 +127,6 @@ def nuevoArchivo():
 	cargoArchivo = False
 	limpiarTexto(ui)
 	mostrarEnConsola("Nuevo archivo abierto")
-
-
 
 # Limpia el contenido de la caja de texto
 def limpiarTexto(self):
