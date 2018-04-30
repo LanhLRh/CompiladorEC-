@@ -54,8 +54,12 @@
              <enum>Qt::LeftToRight</enum>
             </property>
             <property name="styleSheet">
-             <string notr="true">font: 10pt &quot;MS Reference Sans Serif&quot;;
-color: rgb(183,183, 183);</string>
+             <string notr="true">
+             #lbTamano {
+             font: 10pt &quot;MS Reference Sans Serif&quot;;
+             color: rgb(183, 183, 183);
+             }
+             </string>
             </property>
             <property name="text">
              <string>Tamaño de Letra</string>
@@ -76,10 +80,20 @@ color: rgb(183,183, 183);</string>
                </size>
               </property>
               <property name="styleSheet">
-               <string notr="true">border: 1px solid rgb(183,183, 183);
-background-color: rgb(30, 30, 30);
-font: 10pt &quot;MS Reference Sans Serif&quot;;
-color: rgb(183,183, 183);</string>
+               <string notr="true">
+               #btnMenos {
+               border: 1px solid rgb(183,183, 183);
+               background-color: rgb(30, 30, 30);
+               font: 10pt &quot;MS Reference Sans Serif&quot;;
+               color: rgb(183, 183, 183);
+               }
+               #btnMenos:hover {
+               border: 1px solid rgb(9, 145, 229);
+               background-color: rgb(9, 145, 229);
+               font: 10pt &quot;MS Reference Sans Serif&quot;;
+               color: rgb(255, 255, 255);
+               }
+               </string>
               </property>
               <property name="text">
                <string>-</string>
@@ -95,10 +109,20 @@ color: rgb(183,183, 183);</string>
                </size>
               </property>
               <property name="styleSheet">
-               <string notr="true">border: 1px solid rgb(183,183, 183);
-background-color: rgb(30, 30, 30);
-font: 10pt &quot;MS Reference Sans Serif&quot;;
-color: rgb(183,183, 183);</string>
+               <string notr="true">
+               #btnMas {
+               border: 1px solid rgb(183,183, 183);
+               background-color: rgb(30, 30, 30);
+               font: 10pt &quot;MS Reference Sans Serif&quot;;
+               color: rgb(183, 183, 183);
+               }
+               #btnMas:hover {
+               border: 1px solid rgb(9, 145, 229);
+               background-color: rgb(9, 145, 229);
+               font: 10pt &quot;MS Reference Sans Serif&quot;;
+               color: rgb(255, 255, 255);
+               }
+               </string>
               </property>
               <property name="text">
                <string>+</string>
@@ -130,10 +154,20 @@ color: rgb(183,183, 183);</string>
            <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;Hola&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
           </property>
           <property name="styleSheet">
-           <string notr="true">border: 1px solid  rgb(183,183, 183);
-background-color: rgb(30, 30, 30);
-font: 12pt &quot;MS Reference Sans Serif&quot;;
-color: rgb(183,183, 183);</string>
+           <string notr="true">
+           #btnCompilar {
+           border: 1px solid  rgb(183,183, 183);
+           background-color: rgb(30, 30, 30);
+           font: 12pt &quot;MS Reference Sans Serif&quot;;
+           color: rgb(183, 183, 183);
+           }
+           #btnCompilar:hover {
+           border: 1px solid  rgb(9, 145, 229);
+           background-color: rgb(9, 145, 229);
+           font: 12pt &quot;MS Reference Sans Serif&quot;;
+           color: rgb(255, 255, 255);
+           }
+           </string>
           </property>
           <property name="text">
            <string>Compilar</string>
@@ -149,10 +183,20 @@ color: rgb(183,183, 183);</string>
            </size>
           </property>
           <property name="styleSheet">
-           <string notr="true">border: 1px solid  rgb(183,183, 183);
-background-color: rgb(30, 30, 30);
-font: 12pt &quot;MS Reference Sans Serif&quot;;
-color: rgb(183,183, 183);</string>
+           <string notr="true">
+           #btnGuardar {
+           border: 1px solid  rgb(183,183, 183);
+           background-color: rgb(30, 30, 30);
+           font: 12pt &quot;MS Reference Sans Serif&quot;;
+           color: rgb(183, 183, 183);
+           }
+           #btnGuardar:hover {
+           border: 1px solid  rgb(9, 145, 229);
+           background-color: rgb(9, 145, 229);
+           font: 12pt &quot;MS Reference Sans Serif&quot;;
+           color: rgb(255, 255, 255);
+           }
+           </string>
           </property>
           <property name="text">
            <string>Guardar</string>
@@ -168,10 +212,20 @@ color: rgb(183,183, 183);</string>
            </size>
           </property>
           <property name="styleSheet">
-           <string notr="true">border: 1px solid  rgb(183,183, 183);
-background-color: rgb(30, 30, 30);
-font: 12pt &quot;MS Reference Sans Serif&quot;;
-color: rgb(183,183, 183);</string>
+           <string notr="true">
+           #btnAbrir {
+           border: 1px solid  rgb(183,183, 183);
+           background-color: rgb(30, 30, 30);
+           font: 12pt &quot;MS Reference Sans Serif&quot;;
+           color: rgb(183, 183, 183);
+           }
+           #btnAbrir:hover {
+           border: 1px solid  rgb(9, 145, 229);
+           background-color: rgb(9, 145, 229);
+           font: 12pt &quot;MS Reference Sans Serif&quot;;
+           color: rgb(255, 255, 255);
+           }
+           </string>
           </property>
           <property name="text">
            <string>Abrir</string>
@@ -199,10 +253,20 @@ color: rgb(183,183, 183);</string>
            <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;Hola&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
           </property>
           <property name="styleSheet">
-           <string notr="true">border: 1px solid  rgb(183,183, 183);
-background-color: rgb(30, 30, 30);
-font: 12pt &quot;MS Reference Sans Serif&quot;;
-color: rgb(183,183, 183);</string>
+           <string notr="true">
+           #btnNuevo {
+           border: 1px solid  rgb(183,183, 183);
+           background-color: rgb(30, 30, 30);
+           font: 12pt &quot;MS Reference Sans Serif&quot;;
+           color: rgb(183, 183, 183);
+           }
+           #btnNuevo:hover {
+           border: 1px solid  rgb(9, 145, 229);
+           background-color: rgb(9, 145, 229);
+           font: 12pt &quot;MS Reference Sans Serif&quot;;
+           color: rgb(255, 255, 255);
+           }
+           </string>
           </property>
           <property name="text">
            <string>Nuevo</string>
@@ -220,7 +284,11 @@ color: rgb(183,183, 183);</string>
          </font>
         </property>
         <property name="styleSheet">
-         <string notr="true">border: 1px solid red;</string>
+         <string notr="true">
+         #txtCodigo {
+         border: 1px solid red;
+         }
+         </string>
         </property>
        </widget>
       </item>
@@ -240,10 +308,14 @@ color: rgb(183,183, 183);</string>
          </size>
         </property>
         <property name="styleSheet">
-         <string notr="true">border: 1px solid rgb(183,183, 183);
-background-color: rgb(30, 30, 30);
-font: 9pt &quot;Consolas&quot;;
-color: rgb(183,183, 183);</string>
+         <string notr="true">
+         #txtCmd {
+         border: 1px solid rgb(183,183, 183);
+         background-color: rgb(30, 30, 30);
+         font: 9pt &quot;Consolas&quot;;
+         color: rgb(183,183, 183);
+         }
+         </string>
         </property>
         <property name="readOnly">
          <bool>true</bool>
@@ -255,9 +327,13 @@ color: rgb(183,183, 183);</string>
         <item>
          <widget class="QLabel" name="lbInput">
           <property name="styleSheet">
-           <string notr="true">background-color: rgb(30, 30, 30);
-font: 10pt &quot;Consolas&quot;;
-color: rgb(200,200,200);</string>
+           <string notr="true">
+           #lbInput {
+           background-color: rgb(30, 30, 30);
+           font: 10pt &quot;Consolas&quot;;
+           color: rgb(200,200,200);
+           }
+           </string>
           </property>
           <property name="text">
            <string>&gt;&gt;&gt;</string>
@@ -267,10 +343,14 @@ color: rgb(200,200,200);</string>
         <item>
          <widget class="QLineEdit" name="lnInput">
           <property name="styleSheet">
-           <string notr="true">border: 1px solid rgb(183,183, 183);
-background-color: rgb(30, 30, 30);
-font: 9pt &quot;Consolas&quot;;
-color: rgb(200,200,200);</string>
+           <string notr="true">
+           #lnInput {
+           border: 1px solid rgb(183,183, 183);
+           background-color: rgb(30, 30, 30);
+           font: 9pt &quot;Consolas&quot;;
+           color: rgb(200,200,200);
+           }
+           </string>
           </property>
           <property name="frame">
            <bool>true</bool>
