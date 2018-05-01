@@ -91,10 +91,10 @@ posInicial = {
     'booleanGlobal': 3100,
 
     # Funciones
-    'intVar': 4100,
-    'decVar': 5100,
-    'stringVar': 6100,
-    'booleanVar': 7100,
+    'intLocal': 4100,
+    'decLocal': 5100,
+    'stringLocal': 6100,
+    'booleanLocal': 7100,
     
     # Registros termporales
     'intTemp': 8100,
@@ -117,10 +117,10 @@ posLimite = {
     'stringGlobal': 3099,
     'booleanGlobal': 4099,
 
-    'intVar': 5099,
-    'decVar': 6099,
-    'stringVar': 7099,
-    'booleanVar': 8099,
+    'intLocal': 5099,
+    'decLocal': 6099,
+    'stringLocal': 7099,
+    'booleanLocal': 8099,
     
     'intTemp': 9099,
     'decTemp': 10099,
@@ -151,8 +151,8 @@ contadorReg = {
     'stringCTE': 10,
     'booleanCTE': 11,
 
-    'intVar': 12,
-    'decVar': 13,
-    'stringVar': 14,
-    'booleanVar': 15,
+    'intLocal': 12,
+    'decLocal': 13,
+    'stringLocal': 14,
+    'booleanLocal': 15,
 }
