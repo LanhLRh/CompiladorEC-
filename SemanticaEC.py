@@ -8,6 +8,7 @@ from Cubo import *
 # Directorio de procedimientos
 dirProcedimientos = {}
 lineaActual = 1
+
 def setLineaActual(num):
 	global lineaActual
 	lineaActual = num
@@ -32,17 +33,21 @@ cuadruplos = []
 
 numParametros = 1 # Numero de parametros
 tamanoActual = 0  # Tamaño del arreglo
+dirProcString = "HolaCrayola"
 
 # Cubo semantico
 cubo = Cubo()
 
-def p_imprimir(p):
-	'imprimir : '
-	print(dirProcedimientos)
+def p_procFinal(p):
+	'procFinal : '
+	#print(dirProcedimientos)
 	print(pilaOperadores)
 	print(pilaOperandos)
-	imprimir()
+	#imprimir()
 	finalizar("Compilación Exitosa")
+
+def regresaDirProcedimientos():
+	return dirProcedimientos
 
 def imprimir():
 	for index, cuadruplo in enumerate(cuadruplos):
@@ -59,7 +64,7 @@ def p_NP1_DirProced(p):
 # Proc que guarda las funciones en el directorio de funciones
 def p_NP2_NombreFunc(p):
 	'NP2_NombreFunc : '
-	global numParametros, funcionActual		# Globales
+	global numParametros, funcionActual
 	numParametros = 1 						# Inicializar el contador de parametros
 	resetFuncMems()							# Reiniciar las temporales
 	# Guardar nombre y tipo de la funcion
@@ -76,8 +81,8 @@ def p_NP2_NombreFunc(p):
 		memFunc = getEspacioMemoria(tipoFuncion, 'Global')
 		dirProcedimientos['variables'] = {'nombre': funcionActual, 'tipo' : tipoFuncion, 'mem': memFunc}
 
-	# Agregar funcion al directorio	
-	dirProcedimientos['funciones'][funcionActual] = {'retorno' : tipoFuncion, 'variables' : {}, 'mem': memFunc, 'parametros' : {}}
+	# Agregar funcion al directorio	de funciones
+	dirProcedimientos['funciones'][funcionActual] = {'retorno' : tipoFuncion, 'variables' : {}, 'mem': memFunc, 'quad': len(cuadruplos), 'parametros' : {}}
 
 # Procedimiento que agrega la funcion de inicio al directorio
 def p_NP7_Inicio(p):
@@ -109,7 +114,7 @@ def p_NP3_Parametros(p):
 	if tipoParametro != '&':
 		tipoParametro = 'valor'
 		# Agregar el parametro como variable a su función correspondiente en la tabla
-		dirProcedimientos['funciones'][funcionActual]['variables'][nombreParametro] = {'tipo' : tipoActual, 'mem': getEspacioMemoria(tipoActual, 'Var'), 'tamano' : tamanoActual}
+		dirProcedimientos['funciones'][funcionActual]['variables'][nombreParametro] = {'tipo' : tipoActual, 'mem': getEspacioMemoria(tipoActual, 'Local'), 'tamano' : tamanoActual}
 	else:
 		tipoParametro = 'referencia'
 		# Agregar el parametro como variable a su función correspondiente en la tabla
@@ -133,7 +138,7 @@ def p_NP4_Variable(p):
 		if nombreVariable in dirProcedimientos['funciones'][funcionActual]['variables']:
 			finalizar("Linea " + str(lineaActual) + " -> La variable '" + str(nombreVariable) + "' ya fue declarada")
 		# Se mete la variable al directorio
-		dirProcedimientos['funciones'][funcionActual]['variables'][nombreVariable] = {'tipo': tipoActual, 'tamano': 0, 'mem': getEspacioMemoria(tipoActual, 'Var')}
+		dirProcedimientos['funciones'][funcionActual]['variables'][nombreVariable] = {'tipo': tipoActual, 'tamano': 0, 'mem': getEspacioMemoria(tipoActual, 'Local')}
 	# Si la variable es global
 	else:
 		# Comprobar que la variable no este declarada 
@@ -157,7 +162,7 @@ def p_sNP6_Lista(p):
 	if funcionActual != "":
 		dirProcedimientos['funciones'][funcionActual]['variables'][nombreVariable]['tamano'] = tamanoArreglo
 		# Aumentar numero de registros segun el tamaño del arreglo
-		registrosMem[contadorReg[tipoArreglo + 'Var']] += (int(tamanoArreglo) - 1) 
+		registrosMem[contadorReg[tipoArreglo + 'Local']] += (int(tamanoArreglo) - 1) 
 	else:
 		# 
 		dirProcedimientos['variables'][nombreVariable]['tamano'] = tamanoArreglo
@@ -547,3 +552,6 @@ def getEspacioMemoria(tipoVariable, scope):
     tipoMemoria = tipoVariable + scope                # Tipo de dato para saber donde guardar
     registrosMem[contadorReg[tipoMemoria]] += 1       # Aumentar el contador de ese tipo de dato
     return registrosMem[contadorReg[tipoMemoria]] - 1 # Regresar la posicion de memoria en que se guardo
+
+
+crearCuadruplo(code['goto'], None, None, None) 

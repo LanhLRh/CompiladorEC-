@@ -5,10 +5,22 @@ from SemanticaEC import *
 
 # Bandera que indica si esta correcta la entrada
 bCorrecto = True
+directorioProcedimientos = {}
 
 # Regla Inicial
 def p_programa(p):
-    'programa : NP1_DirProced definicion INICIO NP7_Inicio LLAVE_IZQ instruccion LLAVE_DER definicion imprimir'
+	'programa : NP1_DirProced definicion INICIO NP7_Inicio LLAVE_IZQ instruccion LLAVE_DER definicion procFinal'
+
+# Funciones que regresan la información necesaria a la maquina virtual
+def getCuadruplos():
+	return cuadruplos
+
+def getDirectorioProcedimientos():
+	return regresaDirProcedimientos()
+
+def getDirConstantes():
+	return dirConstantes
+#---------------------------------------------------------------------
 
 def p_definicion(p):
     '''definicion :  definicionP
