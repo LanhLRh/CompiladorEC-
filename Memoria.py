@@ -1,7 +1,7 @@
 import numpy
 from Simbolos import *
 
-########### DIRECCIONES VIRTUALES ###########
+#----------------- DIRECCIONES VIRTUALES -----------------------------
 
 # Diccionario que dada una variable constante te regresa su direccion de memoria virtual
 dirConstantes = {}
@@ -18,10 +18,10 @@ registrosMem[contadorReg['decGlobal']] = posInicial['decGlobal']
 registrosMem[contadorReg['stringGlobal']] = posInicial['stringGlobal']
 registrosMem[contadorReg['booleanGlobal']] = posInicial['booleanGlobal']
 
-registrosMem[contadorReg['intVar']] = posInicial['intVar']
-registrosMem[contadorReg['decVar']] = posInicial['decVar']
-registrosMem[contadorReg['stringVar']] = posInicial['stringVar']
-registrosMem[contadorReg['booleanVar']] = posInicial['booleanVar']
+registrosMem[contadorReg['intLocal']] = posInicial['intLocal']
+registrosMem[contadorReg['decLocal']] = posInicial['decLocal']
+registrosMem[contadorReg['stringLocal']] = posInicial['stringLocal']
+registrosMem[contadorReg['booleanLocal']] = posInicial['booleanLocal']
 
 registrosMem[contadorReg['intTemp']] = posInicial['intTemp']
 registrosMem[contadorReg['decTemp']] = posInicial['decTemp']
@@ -34,10 +34,10 @@ registrosMem[contadorReg['stringCTE']] = posInicial['stringCTE']
 registrosMem[contadorReg['booleanCTE']] = posInicial['booleanCTE']
 
 def resetFuncMems():
-    registrosMem[contadorReg['intVar']] = posInicial['intVar']
-    registrosMem[contadorReg['decVar']] = posInicial['decVar']
-    registrosMem[contadorReg['stringVar']] = posInicial['stringVar']
-    registrosMem[contadorReg['booleanVar']] = posInicial['booleanVar']    
+    registrosMem[contadorReg['intLocal']] = posInicial['intLocal']
+    registrosMem[contadorReg['decLocal']] = posInicial['decLocal']
+    registrosMem[contadorReg['stringLocal']] = posInicial['stringLocal']
+    registrosMem[contadorReg['booleanLocal']] = posInicial['booleanLocal']    
 
 # getTipo: Regresa el tipo de dato segun la posicion de memoria que tiene asignado (en codigo)
 def getTipo(dirMemoria): 
@@ -46,10 +46,10 @@ def getTipo(dirMemoria):
     if dirMemoria <= posLimite['stringGlobal']: return code['string']
     if dirMemoria <= posLimite['booleanGlobal']: return code['boolean']
 
-    if dirMemoria <= posLimite['intVar']: return code['int']
-    if dirMemoria <= posLimite['decVar']: return code['dec']
-    if dirMemoria <= posLimite['stringVar']: return code['string']
-    if dirMemoria <= posLimite['booleanVar']: return code['boolean']
+    if dirMemoria <= posLimite['intLocal']: return code['int']
+    if dirMemoria <= posLimite['decLocal']: return code['dec']
+    if dirMemoria <= posLimite['stringLocal']: return code['string']
+    if dirMemoria <= posLimite['booleanLocal']: return code['boolean']
     
     if dirMemoria <= posLimite['intTemp']: return code['int']
     if dirMemoria <= posLimite['decTemp']: return code['dec']
