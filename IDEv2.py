@@ -311,7 +311,7 @@ def procesarCuadruplos():
 			# Se almacena valor global dentro de la estructura que maneja almacenamiento global
 			if direccionAlmacenar in memEjecucion: memEjecucion[direccionAlmacenar] = valorOp1 | valorOp2
 			#Se almacena valor local dentro de la estructura que maneja almacenamiento local
-			else: pilaMemoriaLocal[nivelAlcance][direccionAlmacenar] = valor1 | valor2
+			else: pilaMemoriaLocal[nivelAlcance][direccionAlmacenar] = valorOp1 | valorOp2
 
 		elif code['&'] == operacionCuadruplo:
 			op1 = listaCuadruplos[cuadruploActual].op1 		# Direaccion del Operando 1
