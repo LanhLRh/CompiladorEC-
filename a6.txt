@@ -1,0 +1,10 @@
+inicio
+{
+    si(1 >= 2) {
+        mostrarValor("Hola Crayola");
+    }
+    sino
+    {
+        mostrarValor("n");
+    }
+}

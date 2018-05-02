@@ -49,7 +49,7 @@ code = {
     'deteccion'         : 65,
     'ocultar'           : 66,
     'posicion'          : 67,
-    'mapaCuadricula'    : 68,
+    'dibujar_cuadricula': 68,
     'recogerObjeto'     : 69,
     'dejarObjeto'       : 70,
     'saltar'            : 71,
@@ -71,7 +71,10 @@ code = {
     # Otros
     'finProc': 100,
     'ERA': 101,
-    'parametro' : 102
+    'parametro' : 102,
+    'inicioFunc' : 103,
+    'retu' : 104,
+    'gosub': 105
 }
 
 simb = {
@@ -106,7 +109,8 @@ posInicial = {
     'intCTE': 12100,
     'decCTE': 13100,
     'stringCTE': 14100,
-    'booleanCTE': 15100
+    'booleanCTE': 15100,
+
 }
 
 # Posicion final

@@ -35,7 +35,7 @@ palabras_reservadas = {
     'deteccion'         : 'DETECCION',
     'ocultar'           : 'OCULTAR',
     'posicion'          : 'POSICION',
-    'mapaCuadricula'    : 'MAPA_CUAD',
+    'dibujar_cuadricula'    : 'MAPA_CUAD',
     'recogerObjeto'     : 'RECOGER_OBJ',
     'dejarObjeto'       : 'DEJAR_OBJ',
     'saltar'            : 'SALTAR',
@@ -99,12 +99,15 @@ def t_newline(p):
     p.lexer.lineno += len(p.value)
     setLineaActual(getLineaActual() + len(p.value))
 
+class LexerError(Exception): pass
+
 # Caracteres invalidos
 def t_error(p):
     global bCorrecto
     bCorrecto = False
-    print("Caracter ilegal '%s'" % p.value[0])
-    p.lexer.skip(1)
+    raise LexerError("Caracter ilegal '%s'" % p.value[0])
+    #print("Caracter ilegal '%s'" % p.value[0])
+    #p.lexer.skip(1)
 
 # Construcion del lexer
 lex.lex()

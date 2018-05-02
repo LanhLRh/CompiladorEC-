@@ -39,7 +39,7 @@ def p_instruccion(p):
 				    | empty'''
 
 def p_retorno(p):
-	'retorno : REGRESA expresion'
+	'retorno : REGRESA expresion NP_Retorno'
 
 def p_llamada(p):
 	'''llamada :  COLOCAR NP_FuncEspParam PAREN_IZQ expresion NP_ArgFunEsp COMA expresion NP_ArgFunEsp COMA expresion NP_ArgFunEsp PAREN_DER
@@ -58,11 +58,11 @@ def p_llamada(p):
 				| MATAR_ENEMY NP_FuncEsp PAREN_IZQ PAREN_DER
 				| COLOR NP_FuncEspParam PAREN_IZQ expresion NP_ArgFunEsp PAREN_DER
 				| TRAZO NP_FuncEspParam PAREN_IZQ expresion NP_ArgFunEsp COMA expresion NP_ArgFunEsp PAREN_DER
-				| LEER NP_FuncEsp PAREN_IZQ leerP PAREN_DER
+				| LEER PAREN_IZQ identificador NP_Leer1 COMA expresion NP_Leer2 PAREN_DER
 				| ESCRIBIR NP_FuncEspParam PAREN_IZQ expresion NP_ArgFunEsp PAREN_DER
 				| MOSTRAR_VALOR NP_FuncEspParam PAREN_IZQ expresion NP_ArgFunEsp PAREN_DER
 				| FIN NP_FuncEsp PAREN_IZQ PAREN_DER
-				| ID NP_ERA PAREN_IZQ llamadaP PAREN_DER'''
+				| ID NP_ERA PAREN_IZQ llamadaP PAREN_DER NP_FinInvocacion'''
 def p_llamadaP(p):
 	'''llamadaP : expresion NP_Argumento llamadaPP
     			| empty'''
@@ -110,10 +110,7 @@ def p_declaracion_lista(p):
     
 # MODIFICION: Se cambio la asignacion a una lista
 def p_asignacion(p):
-    'asignacion : ID asignacionP ASIGNACION NP_VariableAPila expresion NP_Asignacion'
-def p_asignacionP(p):
-	'''asignacionP : CORCHETE_IZQ expresion CORCHETE_DER
-    				| empty'''
+    'asignacion : identificador empty ASIGNACION NP_VariableAPila expresion NP_Asignacion'
 
 def p_condicion(p):
     'condicion : SI PAREN_IZQ expresion PAREN_DER NP_Si_Expresion LLAVE_IZQ instruccion LLAVE_DER condicionP'
@@ -193,11 +190,11 @@ def p_lista(p):
 	'lista : CORCHETE_IZQ listaVacia CORCHETE_DER'
 	p[0] = getTamanoActual()
 def p_listaP(p):
-	'''listaP :   COMA expresion listaP
+	'''listaP :   COMA constante NP_ListaCont listaP
     			| empty'''
 	setTamanoActual(getTamanoActual()+1)
 def p_listaVacia(p):
-	'''listaVacia : expresion listaP
+	'''listaVacia : constante NP_ListaCont listaP
 				| empty'''
 
 def p_valor(p):
@@ -218,15 +215,15 @@ def p_boolean(p):
     			| FALSO'''
 	nuevaBoolCTE(p[1])
 
-def p_identificar(p):
-	'identificador : ID'
-	validarIDSemantica(p[1])
+def p_identificador(p):
+	'identificador : ID arreglo'
+	validarIDSemantica(p[1], p[2])
+	p[0] = p[1]
+def p_arreglo(p):
+	'''arreglo : CORCHETE_IZQ expresion CORCHETE_DER
+				| empty'''
 	p[0] = p[1]
 
-def p_leerP(p):
-	'''leerP : expresion
-    			| empty'''
-    
 # Vacio (epsilon)
 def p_empty(p):
     'empty :'
@@ -247,16 +244,16 @@ def p_error(p):
 # Creacion del parser
 parser = yacc.yacc()
 
-'''
-# Lectura de archivo
-nombreArchivo = input("Nombre del archivo: ")
-archivo = open(nombreArchivo, 'r')
-contenidoArch = archivo.read()
-resultado = parser.parse(contenidoArch)
-#print(resultado)
 
-# Notificar si el archivo esta correcto o no
-if bCorrecto == True: print("Archivo correcto")
-else: print("Archivo incorrecto")
-input()
-'''
+if __name__ == '__main__':
+
+	# Lectura de archivo
+	nombreArchivo = input("Nombre del archivo: ")
+	archivo = open(nombreArchivo, 'r')
+	contenidoArch = archivo.read()
+	resultado = parser.parse(contenidoArch)
+	#print(resultado)
+
+	# Notificar si el archivo esta correcto o no
+	if bCorrecto == True: print("Archivo correcto")
+	else: print("Archivo incorrecto")

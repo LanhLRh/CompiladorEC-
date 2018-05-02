@@ -21,7 +21,7 @@ func void hola(int x, dec yy)
 inicio
 {
     int www;
-    #int x = [];
+    #int x = [2];
     hola(2, 3);
     posicion(0,0);
     trazo(verdadero, 1);

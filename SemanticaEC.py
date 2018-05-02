@@ -33,7 +33,7 @@ cuadruplos = []
 
 numParametros = 1 # Numero de parametros
 tamanoActual = 0  # Tamaño del arreglo
-dirProcString = "HolaCrayola"
+ERROR = False
 
 # Cubo semantico
 cubo = Cubo()
@@ -43,8 +43,9 @@ def p_procFinal(p):
 	#print(dirProcedimientos)
 	print(pilaOperadores)
 	print(pilaOperandos)
-	#imprimir()
-	finalizar("Compilación Exitosa")
+	print(pilaSaltos)
+	imprimir()
+	#finalizar("Compilación Exitosa")
 
 def regresaDirProcedimientos():
 	return dirProcedimientos
@@ -74,6 +75,10 @@ def p_NP2_NombreFunc(p):
 	# Comprobar que no sea nombre de una funcion
 	if funcionActual in dirProcedimientos['funciones']:
 		finalizar("Linea " + str(lineaActual) + " -> La función" + str(funcionActual) + " está repetida")
+	
+	# Comprobar que no haya una variable con el nombre de la funcion
+	if funcionActual in dirProcedimientos['variables']:
+		finalizar("Linea " + str(lineaActual) + " -> El nombre " + str(funcionActual) + " ya esta siendo usado por una variable")
 
 	memFunc = None
 	# Para las funciones con valor de retorno, se crea una variable global
@@ -82,7 +87,8 @@ def p_NP2_NombreFunc(p):
 		dirProcedimientos['variables'] = {'nombre': funcionActual, 'tipo' : tipoFuncion, 'mem': memFunc}
 
 	# Agregar funcion al directorio	de funciones
-	dirProcedimientos['funciones'][funcionActual] = {'retorno' : tipoFuncion, 'variables' : {}, 'mem': memFunc, 'quad': len(cuadruplos), 'parametros' : {}}
+	crearCuadruplo(code['inicioFunc'], None, None, funcionActual)
+	dirProcedimientos['funciones'][funcionActual] = {'retorno' : tipoFuncion, 'variables' : {}, 'mem': memFunc, 'cuadruplo': len(cuadruplos), 'parametros' : {}}
 
 # Procedimiento que agrega la funcion de inicio al directorio
 def p_NP7_Inicio(p):
@@ -94,9 +100,12 @@ def p_NP7_Inicio(p):
 	# Comprobar que el inicio no este declarado ya
 	if funcionActual in dirProcedimientos['funciones']:
 		finalizar("Linea " + str(lineaActual) + " -> El inicio ya fue declarado en otra parte")
+		return
 
 	# Agregar funcion al directorio	
-	dirProcedimientos['funciones']['inicio'] = {'retorno' : 'void', 'variables' : {}, 'parametros' : {}}
+	dirProcedimientos['funciones']['inicio'] = {'retorno' : 'void', 'variables' : {}, 'cuadruplo': len(cuadruplos), 'parametros' : {}}
+	cuadruplos[0].llenar(dirProcedimientos['funciones']['inicio']['cuadruplo'])
+	crearCuadruplo(code['inicioFunc'], None, None, funcionActual)
 
 # Procedimiento que guarda los parametros de una funcion dentro del directorio
 def p_NP3_Parametros(p):
@@ -169,12 +178,20 @@ def p_sNP6_Lista(p):
 		# Aumentar numero de registros segun el tamaño del arreglo
 		registrosMem[contadorReg[tipoArreglo + 'Global']] += (int(tamanoArreglo) - 1)
 
+def p_NP_ListaCont(p):
+	'NP_ListaCont :'
+	global tipoActual
+
+	if p[-1] != tipoActual:
+		finalizar("Linea " + str(lineaActual) + " -> Error de tipos en la declaración del arreglo")
+		return
+
 # Argumentos de llamada de una función
 def p_NP_Argumento(p):
 	'NP_Argumento : '
 	global numParametros, funcionInvocada
 
-    # Verificamos que el numero de argumentos siga dentro del rango
+	# Verificamos que el numero de argumentos siga dentro del rango
 	if numParametros in dirProcedimientos['funciones'][funcionInvocada]['parametros']:
 		# Obtener la direccion del argumento
 		argumDir = pilaOperandos.pop()
@@ -204,11 +221,11 @@ def p_NP_ERA(p):
 	'NP_ERA : '
 	global numParametros, funcionInvocada
 	funcionInvocada = p[-1] # Guardar el nombre de la función invocada
-	numParametros = 1       # Inicializar el contador de parametros
+	numParametros = 1	   # Inicializar el contador de parametros
 
 	# Comprobar que la función este declarada
 	if funcionInvocada in dirProcedimientos['funciones']:
-		crearCuadruplo(code['ERA'], funcionInvocada, None, None)
+		crearCuadruplo(code['ERA'], funcionInvocada, None, dirProcedimientos['funciones'][funcionInvocada]['cuadruplo'])
 	# Informar que la función no fue declarada
 	else:
 		finalizar("Linea " + str(lineaActual) + " -> La funcion " + funcionInvocada + " no esta declarada")
@@ -226,19 +243,74 @@ def p_NP_Si_Expresion(p):
 	else:
 		print("Linea", lineaActual, "-> La expresion del estatuto SI debe ser boolean")
 
+# Procedimiento que crea el cuadruplo de retorno
+def p_NP_Retorno(p):
+	'NP_Retorno :'
+	if funcionActual == "":
+		finalizar("Linea", lineaActual, "-> Retorno fuera de función")
+		
+	# Obtenemos la direccion del valor de retorno
+	memRetorno = pilaOperandos.pop()
+
+	# El tipo de expresion debe coincidir con el tipo de retorno
+	tipoFuncion = dirProcedimientos['funciones'][funcionActual]['retorno']
+		
+	if tipoFuncion == "void":
+		finalizar("Linea", lineaActual, "-> La función", funcionActual, "no debe retornar valor")
+	# Direccion de la funcion global que almacena el retorno
+	dirRetornoGlobal = dirProcedimientos['funciones'][funcionActual]['mem']
+		
+	if code[tipoFuncion] == getTipo(memRetorno):
+		# Crear el cuadruplo de retorno
+		crearCuadruplo(code["regresa"], memRetorno, -1, dirRetornoGlobal)
+		crearCuadruplo(code["finProc"], -1, -1, -1)
+	else:
+		finalizar("Linea", lineaActual, "-> Tipo incorrecto de retorno en la funcion")
+
+# Llamada dedes p_valor
+def p_NP_FinInvocacion(p):
+	'NP_FinInvocacion :'
+	global numParametros, funcionInvocada
+
+
+
+	if len(dirProcedimientos['funciones'][funcionInvocada]['parametros']) == numParametros - 1:
+	   
+		crearCuadruplo(code['gosub'], None, None, dirProcedimientos['funciones'][funcionInvocada]['cuadruplo'])
+		
+		dirRetorno = dirProcedimientos['funciones'][funcionInvocada]['mem']
+		if  dirRetorno == None: return
+
+		print("DirRetorno", dirRetorno)
+		# Crear el cuadruplo que guarda el valor de retorno
+		if dirRetorno != -1:
+			tipoRetorno = simbol(getTipo(dirRetorno))
+			nuevaTemporal = memConts[memCont[tipoRetorno + 'Temp']]
+			crearCuadruplo(code['retu'], dirRetorno, -1, nuevaTemporal)
+			pilaOperandos.append(nuevaTemporal)
+			registrosMem[contadorReg[tipoRetorno + 'Temp']] += 1
+		
+	else:
+		terminate("Numero incorrecto de argumentos en la llamada")
+
+cantSinoSi = 0
+
 # Proc que crea los cuadruplos de un else
 def p_NP_Sino(p):
 	'NP_Sino : '
 	crearCuadruplo(code['goto'], None, None, None)		# Crear cuadruplo goto del else
 	cuadruploFalso = pilaSaltos.pop() 					# Sacar la posición de el gotof correspondiente al if de este else
 	pilaSaltos.append(len(cuadruplos) - 1)				# Guardar posición del salto
-	cuadruplos[cuadruploFalso].llenar(cuadruploFalso)	# Rellenar cuadruplo gotof correspondiente
+	cuadruplos[cuadruploFalso].llenar(len(cuadruplos))	# Rellenar cuadruplo gotof correspondiente
 
 # Proc que actualiza el cuadruplo gotof de la condicion
 def p_NP_Si_Cierre(p):
 	'NP_Si_Cierre : '
+	global cantSinoSi
+
 	cuadruploFin = pilaSaltos.pop()
 	cuadruplos[cuadruploFin].llenar(len(cuadruplos))	# Rellenar cuadruplo
+	cantSinoSi -= 1
 
 # Proc que guarda la posicion inicial de la condicion de un ciclo
 def p_NP_Ciclo_Inicio(p):
@@ -272,125 +344,126 @@ def p_NP_Ciclo_Cierre(p):
 
 # Proc que crea los cuadruplos de sumas y restas
 def p_NP_SumResPendientes(p):
-    'NP_SumResPendientes :'
-    # pregunto si tengo sumas o restas pendientes por resolver
-    if len(pilaOperadores) > 0 and (pilaOperadores[-1] == code['+'] or pilaOperadores[-1] == code['-']):
-        
+	'NP_SumResPendientes :'
+	# pregunto si tengo sumas o restas pendientes por resolver
+	if len(pilaOperadores) > 0 and (pilaOperadores[-1] == code['+'] or pilaOperadores[-1] == code['-']):
+		
 		# obtengo direcciones de memoria de los valores a sumar/restar
-        opDir2 = pilaOperandos.pop()	# Operando 1
-        opDir1 = pilaOperandos.pop()	# Operando 2
-        opTypeCode1 = getTipo(opDir1)	# Tipo operando 1
-        opTypeCode2 = getTipo(opDir2)	# Tipo operando 2
-        opeCode = pilaOperadores.pop()	# Operador
+		opDir2 = pilaOperandos.pop()	# Operando 1
+		opDir1 = pilaOperandos.pop()	# Operando 2
+		opTypeCode1 = getTipo(opDir1)	# Tipo operando 1
+		opTypeCode2 = getTipo(opDir2)	# Tipo operando 2
+		opeCode = pilaOperadores.pop()	# Operador
 
 		# Obtener el tipo de registro temporal
-        tipoRegistro = cubo.revisar(abs(opTypeCode1), abs(opTypeCode2), opeCode) 
+		tipoRegistro = cubo.revisar(abs(opTypeCode1), abs(opTypeCode2), opeCode) 
 
 		# Si la operación es posible, se agrega el cuadruplo
-        if tipoRegistro != 'error':
-            # Al tipo de registro se le agrega Temp al final para crear el registro temporal de ese tipo
-            tipoRegistro += "Temp"
+		if tipoRegistro != 'error':
+			# Al tipo de registro se le agrega Temp al final para crear el registro temporal de ese tipo
+			tipoRegistro += "Temp"
 
-            pilaOperandos.append(registrosMem[contadorReg[tipoRegistro]])
-            crearCuadruplo(opeCode, opDir1, opDir2, registrosMem[contadorReg[tipoRegistro]])
-            registrosMem[contadorReg[tipoRegistro]] += 1
-        else:
-            finalizar("Linea " + str(lineaActual) + " -> Error de tipos")
+			pilaOperandos.append(registrosMem[contadorReg[tipoRegistro]])
+			crearCuadruplo(opeCode, opDir1, opDir2, registrosMem[contadorReg[tipoRegistro]])
+			registrosMem[contadorReg[tipoRegistro]] += 1
+		else:
+			finalizar("Linea " + str(lineaActual) + " -> Error de tipos")
 
 # Proc que crea los cuadruplos de multiplicaciones, divisiones y residuos
 def p_NP_MulDivResPendientes(p):
-    'NP_MulDivResPendientes :'
-    # pregunto si tengo sumas o restas pendientes por resolver
-    if len(pilaOperadores) > 0 and (pilaOperadores[-1] == code['*'] or pilaOperadores[-1] == code['/'] or pilaOperadores[-1] == code['%']):
-        
+	'NP_MulDivResPendientes :'
+	# pregunto si tengo sumas o restas pendientes por resolver
+	if len(pilaOperadores) > 0 and (pilaOperadores[-1] == code['*'] or pilaOperadores[-1] == code['/'] or pilaOperadores[-1] == code['%']):
+		
 		# obtengo direcciones de memoria de los valores a sumar/restar
-        opDir2 = pilaOperandos.pop()	# Operando 1
-        opDir1 = pilaOperandos.pop()	# Operando 2
-        opTypeCode1 = getTipo(opDir1)	# Tipo operando 1
-        opTypeCode2 = getTipo(opDir2)	# Tipo operando 2
-        opeCode = pilaOperadores.pop()	# Operador
+		opDir2 = pilaOperandos.pop()	# Operando 1
+		opDir1 = pilaOperandos.pop()	# Operando 2
+		opTypeCode1 = getTipo(opDir1)	# Tipo operando 1
+		opTypeCode2 = getTipo(opDir2)	# Tipo operando 2
+		opeCode = pilaOperadores.pop()	# Operador
 
 		# Obtener el tipo de registro temporal
-        tipoRegistro = cubo.revisar(abs(opTypeCode1), abs(opTypeCode2), opeCode) 
+		tipoRegistro = cubo.revisar(abs(opTypeCode1), abs(opTypeCode2), opeCode) 
 
 		# Si la operación es posible, se agrega el cuadruplo
-        if tipoRegistro != 'error':
-            # Al tipo de registro se le agrega Temp al final para crear el registro temporal de ese tipo
-            tipoRegistro += "Temp"
+		if tipoRegistro != 'error':
+			# Al tipo de registro se le agrega Temp al final para crear el registro temporal de ese tipo
+			tipoRegistro += "Temp"
 
-            pilaOperandos.append(registrosMem[contadorReg[tipoRegistro]])
-            crearCuadruplo(opeCode, opDir1, opDir2, registrosMem[contadorReg[tipoRegistro]])
-            registrosMem[contadorReg[tipoRegistro]] += 1
-        else:
-            finalizar("Linea " + str(lineaActual) + " -> Error de tipos")
+			pilaOperandos.append(registrosMem[contadorReg[tipoRegistro]])
+			crearCuadruplo(opeCode, opDir1, opDir2, registrosMem[contadorReg[tipoRegistro]])
+			registrosMem[contadorReg[tipoRegistro]] += 1
+		else:
+			finalizar("Linea " + str(lineaActual) + " -> Error de tipos")
 
 # Proc que crea los cuadruplos de los operadores logicos
 def p_NP_OpLogicosPendientes(p):
-    'NP_OpLogicosPendientes :'
-    # pregunto si tengo sumas o restas pendientes por resolver
-    if len(pilaOperadores) > 0 and (pilaOperadores[-1] == code['&'] or pilaOperadores[-1] == code['|']):
-        
+	'NP_OpLogicosPendientes :'
+	# pregunto si tengo sumas o restas pendientes por resolver
+	if len(pilaOperadores) > 0 and (pilaOperadores[-1] == code['&'] or pilaOperadores[-1] == code['|']):
+		
 		# obtengo direcciones de memoria de los valores a sumar/restar
-        opDir2 = pilaOperandos.pop()	# Operando 1
-        opDir1 = pilaOperandos.pop()	# Operando 2
-        opTypeCode1 = getTipo(opDir1)	# Tipo operando 1
-        opTypeCode2 = getTipo(opDir2)	# Tipo operando 2
-        opeCode = pilaOperadores.pop()	# Operador
+		opDir2 = pilaOperandos.pop()	# Operando 1
+		opDir1 = pilaOperandos.pop()	# Operando 2
+		opTypeCode1 = getTipo(opDir1)	# Tipo operando 1
+		opTypeCode2 = getTipo(opDir2)	# Tipo operando 2
+		opeCode = pilaOperadores.pop()	# Operador
 
 		# Obtener el tipo de registro temporal
-        tipoRegistro = cubo.revisar(abs(opTypeCode1), abs(opTypeCode2), opeCode) 
+		tipoRegistro = cubo.revisar(abs(opTypeCode1), abs(opTypeCode2), opeCode) 
 
 		# Si la operación es posible, se agrega el cuadruplo
-        if tipoRegistro != 'error':
-            # Al tipo de registro se le agrega Temp al final para crear el registro temporal de ese tipo
-            tipoRegistro += "Temp"
+		if tipoRegistro != 'error':
+			# Al tipo de registro se le agrega Temp al final para crear el registro temporal de ese tipo
+			tipoRegistro += "Temp"
 
-            pilaOperandos.append(registrosMem[contadorReg[tipoRegistro]])
-            crearCuadruplo(opeCode, opDir1, opDir2, registrosMem[contadorReg[tipoRegistro]])
-            registrosMem[contadorReg[tipoRegistro]] += 1
-        else:
-            finalizar("Linea " + str(lineaActual) + " -> Error de tipo")
+			pilaOperandos.append(registrosMem[contadorReg[tipoRegistro]])
+			crearCuadruplo(opeCode, opDir1, opDir2, registrosMem[contadorReg[tipoRegistro]])
+			registrosMem[contadorReg[tipoRegistro]] += 1
+		else:
+			finalizar("Linea " + str(lineaActual) + " -> Error de tipo")
 
 # Proc que crea los cuadruplos de los operadores relacionales
 def p_NP_OpRelacionalesPendientes(p):
-    'NP_OpRelacionalesPendientes :'
-    # pregunto si tengo sumas o restas pendientes por resolver
-    if len(pilaOperadores) > 0 and (pilaOperadores[-1] == code['>'] or pilaOperadores[-1] == code['<'] or pilaOperadores[-1] == code['>='] or pilaOperadores[-1] == code['<='] or pilaOperadores[-1] == code['=='] or pilaOperadores[-1] == code['!=']):
-        
+	'NP_OpRelacionalesPendientes :'
+	# pregunto si tengo sumas o restas pendientes por resolver
+	if len(pilaOperadores) > 0 and (pilaOperadores[-1] == code['>'] or pilaOperadores[-1] == code['<'] or pilaOperadores[-1] == code['>='] or pilaOperadores[-1] == code['<='] or pilaOperadores[-1] == code['=='] or pilaOperadores[-1] == code['!=']):
+		
 		# obtengo direcciones de memoria de los valores a sumar/restar
-        opDir2 = pilaOperandos.pop()	# Operando 1
-        opDir1 = pilaOperandos.pop()	# Operando 2
-        opTypeCode1 = getTipo(opDir1)	# Tipo operando 1
-        opTypeCode2 = getTipo(opDir2)	# Tipo operando 2
-        opeCode = pilaOperadores.pop()	# Operador
+		opDir2 = pilaOperandos.pop()	# Operando 1
+		opDir1 = pilaOperandos.pop()	# Operando 2
+		opTypeCode1 = getTipo(opDir1)	# Tipo operando 1
+		opTypeCode2 = getTipo(opDir2)	# Tipo operando 2
+		opeCode = pilaOperadores.pop()	# Operador
 
 		# Obtener el tipo de registro temporal
-        tipoRegistro = cubo.revisar(abs(opTypeCode1), abs(opTypeCode2), opeCode) 
+		tipoRegistro = cubo.revisar(abs(opTypeCode1), abs(opTypeCode2), opeCode) 
 
 		# Si la operación es posible, se agrega el cuadruplo
-        if tipoRegistro != 'error':
-            # Al tipo de registro se le agrega Temp al final para crear el registro temporal de ese tipo
-            tipoRegistro += "Temp"
+		if tipoRegistro != 'error':
+			# Al tipo de registro se le agrega Temp al final para crear el registro temporal de ese tipo
+			tipoRegistro += "Temp"
 			# Meter a operandos el nuevo temporal
-            pilaOperandos.append(registrosMem[contadorReg[tipoRegistro]])
+			pilaOperandos.append(registrosMem[contadorReg[tipoRegistro]])
 			# Crear cuadruplo con el nuevo temporal y los operandos extraidos de la pila
-            crearCuadruplo(opeCode, opDir1, opDir2, registrosMem[contadorReg[tipoRegistro]])
+			crearCuadruplo(opeCode, opDir1, opDir2, registrosMem[contadorReg[tipoRegistro]])
 			# Aumentar la direccion de memoria para el siguiente registro
-            registrosMem[contadorReg[tipoRegistro]] += 1
-        else:
-            finalizar("Linea " + str(lineaActual) + " -> Error de tipo")
+			registrosMem[contadorReg[tipoRegistro]] += 1
+		else:
+			finalizar("Linea " + str(lineaActual) + " -> Error de tipo")
 
 # Operadores de asignación pendientes
 def p_NP_Asignacion(p):
-    'NP_Asignacion :'
-    resultDir = pilaOperandos.pop()
-    varDir = pilaOperandos.pop()
-    if cubo.revisar(getTipo(resultDir), getTipo(varDir), code['=']) != 'error':
-        crearCuadruplo(code['='], resultDir, None, varDir)
-    else:
-        finalizar("Linea " + str(lineaActual) + " -> Error de tipos en la asignación")
+	'NP_Asignacion :'
+	resultDir = pilaOperandos.pop()
+	varDir = pilaOperandos.pop()
 
-# Validar que existe la variable y meterla a la pila
+	if cubo.revisar(getTipo(resultDir), getTipo(varDir), code['=']) != 'error':
+		crearCuadruplo(code['='], resultDir, None, varDir)
+	else:
+		finalizar("Linea " + str(lineaActual) + " -> Error de tipos en la asignación")
+
+# Valida que existe la variable y meterla a la pila
 def p_NP_VariableAPila(p):
 	'NP_VariableAPila :'
 	validarIDSemantica(p[-3])
@@ -418,12 +491,12 @@ def p_NP_IntCTE(p):
 
 # Nueva constante dec
 def p_NP_DecimalCTE(p):
-    'NP_DecimalCTE :'
-    # Crear la direccion de mem si no existe
-    if not p[-1] in dirConstantes:
-        registrarReg(p[-1], 'decCTE')
+	'NP_DecimalCTE :'
+	# Crear la direccion de mem si no existe
+	if not p[-1] in dirConstantes:
+		registrarReg(p[-1], 'decCTE')
 	# Agregar a la pila de operadores
-    pilaOperandos.append(dirConstantes[p[-1]])
+	pilaOperandos.append(dirConstantes[p[-1]])
 
 # Nueva constante string
 def p_NP_StringCTE(p):
@@ -441,6 +514,7 @@ funcionEspecial = None
 # Crea el cuadruplo de invocación de una función especial sin parametros
 def p_NP_FuncEsp(p):
 	'NP_FuncEsp :'
+	global funcionEspecial
 	funcionEspecial = code[p[-1]]
 	# Crear cuadruplo de la funcion
 	crearCuadruplo(funcionEspecial, None, None, None)
@@ -456,6 +530,15 @@ def p_NP_ArgFunEsp(p):
 	'NP_ArgFunEsp :'
 	# Crear cuadruplo de la funcion obteniendo su argumento de la pila
 	crearCuadruplo(funcionEspecial, pilaOperandos.pop(), None, None)
+
+def p_NP_Leer1(p):
+	'NP_Leer1 :'
+	validarIDSemantica(p[-1])
+
+def p_NP_Leer2(p):
+	'NP_Leer2 :'
+	crearCuadruplo(funcionEspecial, pilaOperandos.pop(), pilaOperandos.pop(), None)
+
 
 #==============================================================================================
 # Agrega un registro a la memoria
@@ -474,35 +557,42 @@ def finalizar(mensaje):
 
 # Actualiza el el tipo actal de variable
 def setTipoActual(nuevoTipo):
-    global tipoActual
-    tipoActual = nuevoTipo
+	global tipoActual
+	tipoActual = nuevoTipo
 
 # Actualiza el tipo actual de variable
 def setFuncionActual(nuevaFuncion):
-    global funcionActual
-    funcionActual = nuevaFuncion
+	global funcionActual
+	funcionActual = nuevaFuncion
 
 # Actualiza el tamaño actual de variable
 def setTamanoActual(nuevoTamano):
-    global tamanoActual
-    tamanoActual = nuevoTamano
+	global tamanoActual
+	tamanoActual = nuevoTamano
 
 # Regresa el tamaño actual de variable
 def getTamanoActual():
-    global tamanoActual
-    return tamanoActual
+	global tamanoActual
+	return tamanoActual
 
 # Funcion que verifica que una variable exista ya sea global o localmente
 def existeVariable(nombreVariable):
-    # Si estamos dentro de una funcion
-    if funcionActual != '':
-        # Si es una variable dentro de la funcion
-        if nombreVariable in dirProcedimientos['funciones'][funcionActual]['variables']:
-            return True
-    # Si es una variable global
-    if nombreVariable in dirProcedimientos['variables']:
-        return True
-    return False
+	# Si estamos dentro de una funcion
+	if funcionActual != '':
+		# Si es una variable dentro de la funcion
+		if nombreVariable in dirProcedimientos['funciones'][funcionActual]['variables']:
+			return True
+	# Si es una variable global
+	if nombreVariable in dirProcedimientos['variables']:
+		return True
+	return False
+
+# Funcion que verifica que una variable exista ya sea global o localmente
+def existeFuncion(nombreFuncion):
+	# Verifica que la funcion este dentro del directorio de funciones
+	if nombreFuncion in dirProcedimientos['funciones']:
+		return True
+	return False
 
 # ======================================================================================
 
@@ -513,45 +603,84 @@ def pushPilaOperadores(operador):
 
 # Agrega el operando recibido a la pila de operandos
 def pushPilaOperandos(operando):
-    global pilaOperadores
-    pilaOperandos.append(code[operando])
+	global pilaOperadores
+	pilaOperandos.append(code[operando])
 
 # Agrega el operando recibido a la pila de operandos
 def nuevaBoolCTE(valBool):
 	global pilaOperadores
-	if valBool == 'verdadero': pilaOperandos.append(registrosMem[contadorReg['booleanCTE']] + 1)
+	if valBool == 'verdadero':
+		pilaOperandos.append(registrosMem[contadorReg['booleanCTE']] + 1)
+		#print(registrosMem[contadorReg['booleanCTE']] + 1)
 	else: pilaOperandos.append(registrosMem[contadorReg['booleanCTE']])
 
 # Crea un cuadruplo
 def crearCuadruplo(operador, op1, op2, registro):
-    global cuadruplos
+	global cuadruplos
 	# Agrega el cuadruplo a la lista de cuadruplos
-    cuadruplos.append(Cuadruplo())
+	cuadruplos.append(Cuadruplo())
 	# Actualiza los valores del cuadruplo agregado
-    cuadruplos[-1].ope = operador
-    cuadruplos[-1].op1 = op1
-    cuadruplos[-1].op2 = op2
-    cuadruplos[-1].reg = registro
+	cuadruplos[-1].ope = operador
+	cuadruplos[-1].op1 = op1
+	cuadruplos[-1].op2 = op2
+	cuadruplos[-1].reg = registro
 
-def validarIDSemantica(IDNombreActual):
+def validarIDSemantica(IDNombreActual, arreglo=""):
 	# Validar que existe la variable
 	if not existeVariable(IDNombreActual):
-		finalizar("Linea " + str(lineaActual) + " -> La variable " + IDNombreActual + " no está declarada")
+		finalizar("Linea " + str(lineaActual) + " -> La variable " + str(IDNombreActual) + " no está declarada")
 
 	# Si variable existe, insertarla en la pila de operandos
-	if funcionActual == '' or IDNombreActual in dirProcedimientos['funciones'][funcionActual]['variables']:
+	if funcionActual != '' and IDNombreActual in dirProcedimientos['funciones'][funcionActual]['variables']:
 		pilaOperandos.append(dirProcedimientos['funciones'][funcionActual]['variables'][IDNombreActual]['mem'])
 
 	elif IDNombreActual in dirProcedimientos['variables']:
 		pilaOperandos.append(dirProcedimientos['variables'][IDNombreActual]['mem'])
 	# Borrar este else
 	else:
-		finalizar("Linea " + str(lineaActual) + " -> La variable " + IDNombreActual + " no fue encontrada")
+		finalizar("Linea " + str(lineaActual) + " -> La variable " + str(IDNombreActual) + " no fue encontrada")
 
 def getEspacioMemoria(tipoVariable, scope):
-    tipoMemoria = tipoVariable + scope                # Tipo de dato para saber donde guardar
-    registrosMem[contadorReg[tipoMemoria]] += 1       # Aumentar el contador de ese tipo de dato
-    return registrosMem[contadorReg[tipoMemoria]] - 1 # Regresar la posicion de memoria en que se guardo
+	tipoMemoria = tipoVariable + scope				# Tipo de dato para saber donde guardar
+	registrosMem[contadorReg[tipoMemoria]] += 1	   # Aumentar el contador de ese tipo de dato
+	return registrosMem[contadorReg[tipoMemoria]] - 1 # Regresar la posicion de memoria en que se guardo
 
 
-crearCuadruplo(code['goto'], None, None, None) 
+def accesoArreglo(IDNombreActual):
+	# Expresion de indexamiento
+	indexMem = pilaOperandos.pop()
+
+	# Si el indice no es un entero, finaliza ejecución
+	if getTipo(indexMem) != code['int']:
+		finalizar("Linea " + str(lineaActual) + " -> El indice de una lista debe ser un valor entero")
+		
+	# Variables auxiliares
+	limiteArreglo = 0
+	tipoArreglo = 0
+	nuevaTemporal = 0
+	dirBase = 0
+		
+	# Encontrar donde esta declarado el arreglo para obtener datos
+	if funcionActual != "" and IDNombreActual in dirProcedimientos['funciones'][funcionActual]['variables']:
+		# Arreglo local a una funcion
+		limiteArreglo = dirProcedimientos['funciones'][funcionActual]['variables'][IDNombreActual]['tamano']
+		dirBase = dirProcedimientos['funciones'][funcionActual]['variables'][IDNombreActual]['mem']
+	else:
+		# Arreglo global
+		limiteArreglo = dirProcedimientos['variables'][IDNombreActual]['tamano']
+		dirBase = dirProcedimientos['variables'][IDNombreActual]['mem']
+
+	# Generar cuadruplos del arreglo
+	tipoArreglo = getTipo(dirBase)
+	nuevaTemporal = getEspacioMemoria(simbol(tipoArreglo), 'Temp')				
+	crearCuadruplo(code['ver'], indexMem, 0, int(limiteArreglo) - 1)
+	dirBase = int(dirBase)
+
+	# Verificación de existencia de constante (posiblemente innecesaria)
+	if not dirBase in dirConstantes:
+		dirConstantes[dirBase] = memConts[memCont['intCTE']]
+		registrosMem[contadorReg['intCTE']] += 1
+	crearCuadruplo(code['+'], dirConstantes[dirBase], indexMem, nuevaTemporal)
+	pilaOperandos.append(nuevaTemporal * -1)
+
+crearCuadruplo(code['goto'], 'inicio', None, None) 
