@@ -138,6 +138,13 @@ interfaceTortuga = False
 def procesarCuadruplos():
 
 	global cuadruploActual, pilaMemoriaLocal, listaCuadruplos, memEjecucion, nivelAlcance, interfaceTortuga, pilaApunCuadruplo
+
+	cuadruploActual = 0
+	pilaMemoriaLocal.clear()
+	interfaceTortuga = False
+	for contenido, direccion in listaConstantes.items():
+		memEjecucion[int(direccion)] = contenido 		# Guardar (Direccion : Contenido)
+
 	cantidadCuadruplos = len(listaCuadruplos)
 	# Agregar Memoria local para la funcion principal
 	pilaMemoriaLocal.append({})
@@ -176,6 +183,9 @@ def procesarCuadruplos():
 			# Se incrementa el nuevo nivel de entorno de valores locales a uno mayor
 			nivelAlcance = nivelAlcance + 1
 			cuadruploActual -= 1
+		elif code['ERA'] == operacionCuadruplo:
+			# Se le agrega una nuevo entorno de variables locales para la funcion a ser invocada
+			pilaMemoriaLocal.append({})
 
 		elif code['finProc'] == operacionCuadruplo:
 			# Se obtiene el apuntador a cuadruplo que se dejo dormido donde se invoco la rutina que acaba de terminar
@@ -183,13 +193,15 @@ def procesarCuadruplos():
 			
 			# Se decrementa el nivel de entorno de los valores locales pero sin destruir el de la funcion recien terminada
 			nivelAlcance -= 1
+			cuadruploActual -= 1
 
 			# Si el cuadruplo al que se regresa no tiene operaciones de referencia
+			print(cuadruploActual)
 			if listaCuadruplos[cuadruploActual].ope != "referencia":
 				#Se 'destruye' toda la memoria de entorno local de la funcion que recien acaba de terminar pues ya no se requiere
 				pilaMemoriaLocal.pop()
     
-			cuadruploActual -= 1
+			
 
 		elif code['regresa'] == operacionCuadruplo:
 			operando1 = listaCuadruplos[cuadruploActual].op1
@@ -213,7 +225,7 @@ def procesarCuadruplos():
 			valor1 = getValorMemoria(operando1, nivelAlcance)
 
 			#Se obtiene la direccion absoluta en caso de que sea una direccion indirecta
-			direccionAlmacenar = encontrarDireccionAbs(listaCuadruplos[cuadruploActual].r, nivelAlcance)
+			direccionAlmacenar = encontrarDireccionAbs(listaCuadruplos[cuadruploActual].reg, nivelAlcance)
 
 			# Se inicializa valor de la variable local en la funcion a ejecutarse
 			pilaMemoriaLocal[nivelAlcance + 1][direccionAlmacenar] = valor1
@@ -505,7 +517,6 @@ def procesarCuadruplos():
 		# Aumentar el contador de cuadruplos
 		cuadruploActual += 1
 
-
 def mainMaquinaVirtual():
 	# Lectura de archivo
 	global directorioProc, listaCuadruplos, listaConstantes
@@ -514,9 +525,6 @@ def mainMaquinaVirtual():
 	listaCuadruplos = getCuadruplos()
 	listaConstantes = getDirConstantes()
 	print("Inicializalizacion de Maquina Virtual")
-
-	for contenido, direccion in listaConstantes.items():
-		memEjecucion[int(direccion)] = contenido 		# Guardar (Direccion : Contenido)
 
 	procesarCuadruplos()
 	print(memEjecucion)
