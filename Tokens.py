@@ -35,7 +35,7 @@ palabras_reservadas = {
     'deteccion'         : 'DETECCION',
     'ocultar'           : 'OCULTAR',
     'posicion'          : 'POSICION',
-    'dibujar_cuadricula'    : 'MAPA_CUAD',
+    'dibujar_cuadricula': 'MAPA_CUAD',
     'recogerObjeto'     : 'RECOGER_OBJ',
     'dejarObjeto'       : 'DEJAR_OBJ',
     'saltar'            : 'SALTAR',

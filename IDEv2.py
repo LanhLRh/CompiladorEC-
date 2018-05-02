@@ -522,7 +522,9 @@ def mainMaquinaVirtual():
 	global directorioProc, listaCuadruplos, listaConstantes
 
 	directorioProc = getDirectorioProcedimientos()
+	
 	listaCuadruplos = getCuadruplos()
+	
 	listaConstantes = getDirConstantes()
 	print("Inicializalizacion de Maquina Virtual")
 

@@ -61,6 +61,7 @@ def p_NP1_DirProced(p):
 	global dirProcedimientos
 	# Inicializar el directorio de procedimientos con los espacios para funciones y variables
 	dirProcedimientos = {'funciones': {}, 'variables': {}}
+	resetTodo()
 
 # Proc que guarda las funciones en el directorio de funciones
 def p_NP2_NombreFunc(p):
@@ -262,8 +263,8 @@ def p_NP_Retorno(p):
 		
 	if code[tipoFuncion] == getTipo(memRetorno):
 		# Crear el cuadruplo de retorno
-		crearCuadruplo(code["regresa"], memRetorno, -1, dirRetornoGlobal)
-		crearCuadruplo(code["finProc"], -1, -1, -1)
+		crearCuadruplo(code["regresa"], memRetorno, None, dirRetornoGlobal)
+		crearCuadruplo(code["finProc"], None, None, None)
 	else:
 		finalizar("Linea", lineaActual, "-> Tipo incorrecto de retorno en la funcion")
 
@@ -272,21 +273,19 @@ def p_NP_FinInvocacion(p):
 	'NP_FinInvocacion :'
 	global numParametros, funcionInvocada
 
-
-
 	if len(dirProcedimientos['funciones'][funcionInvocada]['parametros']) == numParametros - 1:
 	   
 		crearCuadruplo(code['gosub'], None, None, dirProcedimientos['funciones'][funcionInvocada]['cuadruplo'])
 		
 		dirRetorno = dirProcedimientos['funciones'][funcionInvocada]['mem']
-		if  dirRetorno == None: return
+		if dirRetorno == None: return
 
 		print("DirRetorno", dirRetorno)
 		# Crear el cuadruplo que guarda el valor de retorno
 		if dirRetorno != -1:
 			tipoRetorno = simbol(getTipo(dirRetorno))
-			nuevaTemporal = memConts[memCont[tipoRetorno + 'Temp']]
-			crearCuadruplo(code['retu'], dirRetorno, -1, nuevaTemporal)
+			nuevaTemporal = registrosMem[contadorReg[tipoRetorno + 'Temp']]
+			crearCuadruplo(code['retu'], dirRetorno, None, nuevaTemporal)
 			pilaOperandos.append(nuevaTemporal)
 			registrosMem[contadorReg[tipoRetorno + 'Temp']] += 1
 		

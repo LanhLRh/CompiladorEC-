@@ -37,7 +37,28 @@ def resetFuncMems():
     registrosMem[contadorReg['intLocal']] = posInicial['intLocal']
     registrosMem[contadorReg['decLocal']] = posInicial['decLocal']
     registrosMem[contadorReg['stringLocal']] = posInicial['stringLocal']
-    registrosMem[contadorReg['booleanLocal']] = posInicial['booleanLocal']    
+    registrosMem[contadorReg['booleanLocal']] = posInicial['booleanLocal']
+
+def resetTodo():
+    registrosMem[contadorReg['intGlobal']] = posInicial['intGlobal']
+    registrosMem[contadorReg['decGlobal']] = posInicial['decGlobal']
+    registrosMem[contadorReg['stringGlobal']] = posInicial['stringGlobal']
+    registrosMem[contadorReg['booleanGlobal']] = posInicial['booleanGlobal']
+
+    registrosMem[contadorReg['intLocal']] = posInicial['intLocal']
+    registrosMem[contadorReg['decLocal']] = posInicial['decLocal']
+    registrosMem[contadorReg['stringLocal']] = posInicial['stringLocal']
+    registrosMem[contadorReg['booleanLocal']] = posInicial['booleanLocal']
+
+    registrosMem[contadorReg['intTemp']] = posInicial['intTemp']
+    registrosMem[contadorReg['decTemp']] = posInicial['decTemp']
+    registrosMem[contadorReg['stringTemp']] = posInicial['stringTemp']
+    registrosMem[contadorReg['booleanTemp']] = posInicial['booleanTemp']
+
+    registrosMem[contadorReg['intCTE']] = posInicial['intCTE']
+    registrosMem[contadorReg['decCTE']] = posInicial['decCTE']
+    registrosMem[contadorReg['stringCTE']] = posInicial['stringCTE']
+    registrosMem[contadorReg['booleanCTE']] = posInicial['booleanCTE']
 
 # getTipo: Regresa el tipo de dato segun la posicion de memoria que tiene asignado (en codigo)
 def getTipo(dirMemoria): 
