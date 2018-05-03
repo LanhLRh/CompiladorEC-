@@ -597,12 +597,14 @@ def mainMaquinaVirtual():
 	listaConstantes = getDirConstantes()
 	print("Inicializalizacion de Maquina Virtual")
 
+	# e agregan a memoria constantes predefinidas booleanas
+	memEjecucion[int(posInicial['booleanCTE'])] = False
+	memEjecucion[int(posInicial['booleanCTE'])+1] = True
+
 	procesarCuadruplos()
 	print(memEjecucion)
 
-	#Se agregan a memoria constantes predefinidas booleanas
-	memEjecucion[int(posInicial['booleanCTE'])] = False
-	memEjecucion[int(posInicial['booleanCTE'] + 1)] = True
+
 
 
 # Función que compila el programa
