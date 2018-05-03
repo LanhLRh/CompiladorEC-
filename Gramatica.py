@@ -113,13 +113,15 @@ def p_asignacion(p):
     'asignacion : identificador empty ASIGNACION NP_VariableAPila expresion NP_Asignacion'
 
 def p_condicion(p):
-    'condicion : SI PAREN_IZQ expresion PAREN_DER NP_Si_Expresion LLAVE_IZQ instruccion LLAVE_DER condicionP'
-def p_condicionP(p):
-	'''condicionP : SINO NP_Sino condicionPP
-    				| empty'''
-def p_condicionPP(p):
-	'''condicionPP : LLAVE_IZQ instruccion LLAVE_DER NP_Si_Cierre
-    				| condicion'''
+    'condicion : SI PAREN_IZQ expresion NP_Si_Condicion PAREN_DER LLAVE_IZQ instruccion LLAVE_DER condicion_sinosi condicion_sino NP_Si_Cierre'
+    
+def p_condicion_sinosi(p):
+    '''condicion_sinosi : SINOSI NP_Sinosi NP_Sino PAREN_IZQ expresion NP_Si_Condicion PAREN_DER LLAVE_IZQ instruccion LLAVE_DER condicion_sinosi
+                        | empty'''
+
+def p_condicion_sino(p):
+    '''condicion_sino : SINO NP_Sino LLAVE_IZQ instruccion LLAVE_DER
+                      | empty'''
 
 # MODIFICACION: repetir puede usar una variable entera o una constante entera
 def p_ciclo(p):

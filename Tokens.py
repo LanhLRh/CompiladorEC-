@@ -24,6 +24,7 @@ palabras_reservadas = {
     'nulo'              : 'NULO',
     'si'	            : 'SI',
     'sino'	            : 'SINO',
+    'sinosi'            : 'SINOSI',
     'mientras'          : 'MIENTRAS',
     'repetir'           : 'REPETIR',
     'colocarObjeto'     : 'COLOCAR',

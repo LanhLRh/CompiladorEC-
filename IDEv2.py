@@ -95,7 +95,7 @@ def getValorMemoria(numDireccion, alcanceFuncion = 0):
 			if tipoDato == code['int']: valor = int(memEjecucion[numDireccion])
 			elif tipoDato == code['dec']: valor = float(memEjecucion[numDireccion])
 			elif tipoDato == code['boolean']: valor = bool(memEjecucion[numDireccion])
-			else: valor = str(memEjecucion[numDireccion])
+			else: valor = str(memEjecucion[numDireccion][1:-1])
 			return valor
 		# Si no esta inicializada, inicializar a valor default y regresar dicho valor
 		else:
@@ -121,7 +121,7 @@ def getValorMemoria(numDireccion, alcanceFuncion = 0):
 			if tipoDato == code['int']: valor = int(pilaMemoriaLocal[alcanceFuncion][numDireccion])
 			elif tipoDato == code['dec']: valor = float(pilaMemoriaLocal[alcanceFuncion][numDireccion])
 			elif tipoDato == code['boolean']: valor = bool(pilaMemoriaLocal[alcanceFuncion][numDireccion])
-			else: valor = str(pilaMemoriaLocal[alcanceFuncion][numDireccion])
+			else: valor = str(pilaMemoriaLocal[alcanceFuncion][numDireccion][1:-1])
 
 			print(valor)
 			return valor
@@ -231,6 +231,7 @@ def procesarCuadruplos():
 			if listaCuadruplos[cuadruploActual].ope != "referencia":
 				#Se 'destruye' toda la memoria de entorno local de la funcion que recien acaba de terminar pues ya no se requiere
 				pilaMemoriaLocal.pop()
+
 		# Aignación de lo que regreso la función
 		elif code['retu'] == operacionCuadruplo:
 			operando1 = listaCuadruplos[cuadruploActual].op1
@@ -339,7 +340,7 @@ def procesarCuadruplos():
 			op2 = listaCuadruplos[cuadruploActual].op2 		# Direccion del Operando 2
 			valorOp1 = getValorMemoria(op1, nivelAlcance)	# Obtener el valor del Operando 1
 			valorOp2 = getValorMemoria(op2, nivelAlcance)	# Obtener el valor del Operando 2)
-			
+
 			# Direccion donde se almacenara el resultado de la operacion
 			direccionAlmacenar = int(encontrarDireccionAbs(listaCuadruplos[cuadruploActual].reg, nivelAlcance))
 			print(pilaMemoriaLocal)
@@ -350,8 +351,6 @@ def procesarCuadruplos():
 			# Se almacena valor local dentro de la estructura que maneja almacenamiento local
 			else:
 				pilaMemoriaLocal[nivelAlcance][direccionAlmacenar] = valorOp1 + valorOp2
-			
-			print(pilaMemoriaLocal[nivelAlcance])
 
 		elif code['|'] == operacionCuadruplo:
 			op1 = listaCuadruplos[cuadruploActual].op1 		# Direaccion del Operando 1
@@ -470,6 +469,10 @@ def procesarCuadruplos():
 			#Se almacena valor local dentro de la estructura que maneja almacenamiento local
 			else: pilaMemoriaLocal[nivelAlcance][direccionAlmacenar] = valorOp1 == valorOp2
 
+			print("Direccion Almacenar", direccionAlmacenar)
+			print("Memoria EJecucion", memEjecucion)
+			print("Mem Local", pilaMemoriaLocal)
+
 		elif code['!='] == operacionCuadruplo:
 			op1 = listaCuadruplos[cuadruploActual].op1 		# Direaccion del Operando 1
 			op2 = listaCuadruplos[cuadruploActual].op2 		# Direccion del Operando 2
@@ -484,8 +487,7 @@ def procesarCuadruplos():
 			else: pilaMemoriaLocal[nivelAlcance][direccionAlmacenar] = valorOp1 != valorOp2
 
 		elif code['escribir'] == operacionCuadruplo:
-			print("Memoria Local:",pilaMemoriaLocal)
-			print("Nivel Alcance:",nivelAlcance)
+
 			escritoDir = listaCuadruplos[cuadruploActual].op1 		# Direccion de la temporal a imprimir
 			print("Direccion a imprimir:", escritoDir)
 			escrito = getValorMemoria(escritoDir, nivelAlcance)	# Obtener el valor de la direccion

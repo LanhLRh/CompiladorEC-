@@ -231,19 +231,6 @@ def p_NP_ERA(p):
 	else:
 		finalizar("Linea " + str(lineaActual) + " -> La funcion " + funcionInvocada + " no esta declarada")
 
-# Proc que crea los cuadruplos de un condicion
-def p_NP_Si_Expresion(p):
-	'NP_Si_Expresion : '
-	expresionIF = pilaOperandos.pop()
-
-	# Comprobar que dentro del if hay un booleano
-	if getTipo(expresionIF) == code['boolean']: # Revisar
-		# Crear cuadruplo gotof
-		crearCuadruplo(code['gotof'], expresionIF, None, None)
-		pilaSaltos.append(len(cuadruplos) - 1) # Guardar la posición del salto
-	else:
-		print("Linea", lineaActual, "-> La expresion del estatuto SI debe ser boolean")
-
 # Procedimiento que crea el cuadruplo de retorno
 def p_NP_Retorno(p):
 	'NP_Retorno :'
@@ -292,24 +279,45 @@ def p_NP_FinInvocacion(p):
 	else:
 		terminate("Numero incorrecto de argumentos en la llamada")
 
-cantSinoSi = 0
+# Condicional SI ---------------------------------------------
 
-# Proc que crea los cuadruplos de un else
-def p_NP_Sino(p):
-	'NP_Sino : '
-	crearCuadruplo(code['goto'], None, None, None)		# Crear cuadruplo goto del else
-	cuadruploFalso = pilaSaltos.pop() 					# Sacar la posición de el gotof correspondiente al if de este else
-	pilaSaltos.append(len(cuadruplos) - 1)				# Guardar posición del salto
-	cuadruplos[cuadruploFalso].llenar(len(cuadruplos))	# Rellenar cuadruplo gotof correspondiente
+# Contador para saber cuantos cuadruplos de elif se dejaron pendientes por llenar
+contSinosi = 0
 
-# Proc que actualiza el cuadruplo gotof de la condicion
+# Llamada desde p_condicional
+def p_NP_Si_Condicion(p):
+    'NP_Si_Condicion :'
+    condicion = pilaOperandos.pop()
+    if getTipo(condicion) != code['boolean']:
+        finalizar("Linea", lineaActual, "-> La expresion del estatuto SI debe ser boolean")
+    else:
+        crearCuadruplo(code['gotof'], condicion, -1, -1)
+        pilaSaltos.append(len(cuadruplos) - 1)
+        
 def p_NP_Si_Cierre(p):
-	'NP_Si_Cierre : '
-	global cantSinoSi
+    'NP_Si_Cierre :'
+    global contSinosi
+    # Llenar todos los goto pendientes hacia al zona ya no condicionada
+    # es +1 porque tengo que hacer el ciclo aunque sea 1 vez para cerrar el primer if
+    while contSinosi + 1 > 0:
+        salidaCondicion = pilaSaltos.pop()
+        cuadruplos[salidaCondicion].llenar(len(cuadruplos))
+        contSinosi -= 1
+    contSinosi = 0
+    
+def p_NP_Sino(p):
+    'NP_Sino :'
+    siFalso = pilaSaltos.pop()
+    crearCuadruplo(code['goto'], -1, -1, -1)
+    pilaSaltos.append(len(cuadruplos) - 1)
+    cuadruplos[siFalso].llenar(len(cuadruplos))
+    
+def p_NP_Sinosi(p):
+    'NP_Sinosi :'
+    global contSinosi
+    contSinosi += 1
 
-	cuadruploFin = pilaSaltos.pop()
-	cuadruplos[cuadruploFin].llenar(len(cuadruplos))	# Rellenar cuadruplo
-	cantSinoSi -= 1
+# Termina condicion ----------------------------------------------------------
 
 # Proc que guarda la posicion inicial de la condicion de un ciclo
 def p_NP_Ciclo_Inicio(p):
