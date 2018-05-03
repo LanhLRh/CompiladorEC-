@@ -38,7 +38,7 @@ class ResaltadorLineas(QSyntaxHighlighter):
     # Palabras clave
     keywords = [
         'func','repetir', 'si', 'sino',
-        'regresar', 'mientras',
+        'regresa', 'mientras',
         'Nulo', 'verdadero', 'falso',
     ]
 
