@@ -58,7 +58,9 @@ def imprimir():
 # Crea el directorio de procedimientos y variables
 def p_NP1_DirProced(p):
 	'NP1_DirProced : '
-	global dirProcedimientos
+	global dirProcedimientos, cuadruplos
+	del cuadruplos[:]
+	crearCuadruplo(code['goto'], 'inicio', None, None) 
 	# Inicializar el directorio de procedimientos con los espacios para funciones y variables
 	dirProcedimientos = {'funciones': {}, 'variables': {}}
 	resetTodo()
@@ -159,7 +161,9 @@ def p_NP4_Variable(p):
 # Procedimiento que guarda las listas en el directorio
 def p_sNP6_Lista(p):
 	'NP6_Lista :'
-	tamanoArreglo = p[-1]		# Obtenemos el tamaño del arreglo
+
+	tamanoArreglo = pilaOperandos.pop()		# Obtenemos el tamaño del arreglo
+	print(tamanoArreglo)
 
 	# Si el tamaño es menor a 0
 	if int(tamanoArreglo) < 0:
@@ -690,5 +694,3 @@ def accesoArreglo(IDNombreActual):
 		registrosMem[contadorReg['intCTE']] += 1
 	crearCuadruplo(code['+'], dirConstantes[dirBase], indexMem, nuevaTemporal)
 	pilaOperandos.append(nuevaTemporal * -1)
-
-crearCuadruplo(code['goto'], 'inicio', None, None) 
