@@ -231,22 +231,6 @@ def p_NP_ERA(p):
 	# Informar que la función no fue declarada
 	else:
 		finalizar("Linea " + str(lineaActual) + " -> La funcion " + funcionInvocada + " no esta declarada")
-
-
-def p_smNewInvocacion(p):
-	global funcionInvocada
-	global numParametros
-
-	numParametros = 1
-
-	nombreFuncion = p[-2]
-	funcionInvocada = nombreFuncion
-
-	if nombreFuncion in dirProcedimientos['funciones']:
-		# Funcion simple en el scope actual
-		crearCuadruplo(code['ERA'], None, None, dirProcedimientos['funciones'][nombreFuncion]['cuadruplo'])
-	else:
-		finalizar("Funcion " + nombreFuncion + " no fue declarada")
                 
 # Procedimiento que crea el cuadruplo de retorno
 def p_NP_Retorno(p):
