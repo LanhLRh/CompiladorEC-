@@ -5,6 +5,36 @@ from PyQt5.QtGui import QTextOption, QTextCursor, QFontMetrics
 from PyQt5.QtGui import (QColor, QPainter, QFont, QSyntaxHighlighter, QTextFormat, QTextCharFormat)
 import SintaxisEC
 
+# --------------------------------
+# Creacion del mundo de la tortuga
+# --------------------------------
+import turtle
+import tkinter as tk
+from Bloque import *
+from Objeto import *
+
+canvas_dimension = 400
+bloques_cantidad = 10
+bloque_dimension = int(canvas_dimension / bloques_cantidad)
+canvas_color = "royal blue"
+tortuga = None
+
+# Creación del canvas
+raiz = tk.Tk()
+raiz.title("Tortuga")
+raiz.resizable(width=False, height=False)
+canvas = tk.Canvas(master = raiz, width = canvas_dimension, height = canvas_dimension, bd = 0, highlightthickness = 0)
+canvas.pack()
+
+# Crea tortuga para configurar mundo
+tortuga = turtle.RawTurtle(canvas)
+tortuga.hideturtle()
+ventana = tortuga.getscreen()
+ventana.bgcolor(canvas_color)
+
+from gridOne import *
+# --------------------------------
+
 import sys
 from Cuadruplo import *
 from Simbolos import *
@@ -46,7 +76,7 @@ def encontrarDireccionAbs(numDireccion, alcanceFuncion):
     if numDireccion < -1:
         #Se obtiene el valor de la verdadera direccion que almacena esta indirecta
         return getValorMemoria(abs(numDireccion), alcanceFuncion)
-    else: return numDireccion
+    else: return int(numDireccion)
 
 #Recibe una direccion y nivel de alcance para retornar el valor de la estructura pertinente segun la misma direccion: memoria global o local
 def getValorMemoria(numDireccion, alcanceFuncion = 0):
@@ -183,6 +213,7 @@ def procesarCuadruplos():
 			# Se incrementa el nuevo nivel de entorno de valores locales a uno mayor
 			nivelAlcance = nivelAlcance + 1
 			cuadruploActual -= 1
+
 		elif code['ERA'] == operacionCuadruplo:
 			# Se le agrega una nuevo entorno de variables locales para la funcion a ser invocada
 			pilaMemoriaLocal.append({})
@@ -200,10 +231,8 @@ def procesarCuadruplos():
 			if listaCuadruplos[cuadruploActual].ope != "referencia":
 				#Se 'destruye' toda la memoria de entorno local de la funcion que recien acaba de terminar pues ya no se requiere
 				pilaMemoriaLocal.pop()
-    
-			
-
-		elif code['regresa'] == operacionCuadruplo:
+		# Aignación de lo que regreso la función
+		elif code['retu'] == operacionCuadruplo:
 			operando1 = listaCuadruplos[cuadruploActual].op1
 			valor1 = getValorMemoria(operando1, nivelAlcance)
 
@@ -218,6 +247,18 @@ def procesarCuadruplos():
 				#Se checa si la direccion a asignar valor es entera para almacenar solo la parte entera
 				if esNumero(direccionAlmacenar): pilaMemoriaLocal[nivelAlcance][direccionAlmacenar] = int(valor1)
 				else: pilaMemoriaLocal[nivelAlcance][direccionAlmacenar] = valor1
+
+		# 'Regresa' de la función
+		elif code['regresa'] == operacionCuadruplo:
+			operando1 = listaCuadruplos[cuadruploActual].op1
+			valor1 = getValorMemoria(operando1, nivelAlcance)
+
+			#Se obtiene la direccion absoluta en caso de que sea una direccion indirecta
+			direccionAlmacenar = int(encontrarDireccionAbs(listaCuadruplos[cuadruploActual].reg, nivelAlcance))
+
+			#Se checa si la direccion a asignar valor es entera para almacenar solo la parte entera
+			if esNumero(direccionAlmacenar): memEjecucion[direccionAlmacenar] = int(valor1)
+			else: memEjecucion[direccionAlmacenar] = valor1
 
 		elif code['parametro'] == operacionCuadruplo:
 
@@ -443,35 +484,61 @@ def procesarCuadruplos():
 			else: pilaMemoriaLocal[nivelAlcance][direccionAlmacenar] = valorOp1 != valorOp2
 
 		elif code['escribir'] == operacionCuadruplo:
+			print("Memoria Local:",pilaMemoriaLocal)
+			print("Nivel Alcance:",nivelAlcance)
 			escritoDir = listaCuadruplos[cuadruploActual].op1 		# Direccion de la temporal a imprimir
+			print("Direccion a imprimir:", escritoDir)
 			escrito = getValorMemoria(escritoDir, nivelAlcance)	# Obtener el valor de la direccion
-			print(escrito)
+			print("Valor escrito:", escrito)
 			mostrarEnConsola(escrito)
 
 		elif code['fin'] == operacionCuadruplo:
 			return
 
-		elif code['dibujar_cuadricula'] == operacionCuadruplo:
-			if interfaceTortuga:
-				global canvas_dimension, bloque_dimension, bloques_cantidad
-				print(canvas_dimension, bloque_dimension, bloques_cantidad)
-				cuadricula = define_cuadricula(canvas_dimension, bloques_cantidad, bloque_dimension)
-				color_lineas = "white"
-				dibuja_cuadricula(canvas_dimension, bloques_cantidad, bloque_dimension)
-				#dibujar_cuadricula(canvasDimension, canvasDimension/bloquesCantidad, color_lineas)
-			else:
-				cuadruploActual -= 1
-				interfaceTortuga = True
+		# ------------------------------------------
 
 		elif code['colocarObjeto'] == operacionCuadruplo:
-			if interfaceTortuga:
-				pass
+			v_1 = getValorMemoria(listaCuadruplos[cuadruploActual].op1, nivelAlcance)
+			v_2 = getValorMemoria(listaCuadruplos[cuadruploActual+1].op1, nivelAlcance)
+			v_3 = getValorMemoria(listaCuadruplos[cuadruploActual+2].op1, nivelAlcance)
+			cuadruploActual = cuadruploActual + 2
+			global tortuga
+			tortuga = colocarObjeto(canvas, v_2, v_3)
 
-			else:
-				cuadruploActual -= 1
-				interfaceTortuga = True
+		elif code['mover'] == operacionCuadruplo:
+			v_1 = getValorMemoria(listaCuadruplos[cuadruploActual].op1, nivelAlcance)
+			mover(tortuga, v_1)
 
+		elif code['rotar'] == operacionCuadruplo:
+			v_1 = getValorMemoria(listaCuadruplos[cuadruploActual].op1, nivelAlcance)
+			rotar(tortuga, v_1)
 
+		elif code['girarDerecha'] == operacionCuadruplo:
+			girarDerecha(tortuga)
+		
+		elif code['girarIzquierda'] == operacionCuadruplo:
+			girarIzquierda(tortuga)
+
+		elif code['ocultar'] == operacionCuadruplo:
+			v_1 = getValorMemoria(listaCuadruplos[cuadruploActual].op1, nivelAlcance)
+			ocultar( tortuga, v_1)
+
+		elif code['posicion'] == operacionCuadruplo:
+			v_1 = getValorMemoria(listaCuadruplos[cuadruploActual].op1, nivelAlcance)
+			v_2 = getValorMemoria(listaCuadruplos[cuadruploActual+1].op1, nivelAlcance)
+			cuadruploActual = cuadruploActual + 1
+			posicion(tortuga, v_1, v_2)
+
+		elif code['color'] == operacionCuadruplo:
+			v_1 = getValorMemoria(listaCuadruplos[cuadruploActual].op1, nivelAlcance)
+			color(tortuga, v_1)
+
+		elif code['trazo'] == operacionCuadruplo:
+			v_1 = getValorMemoria(listaCuadruplos[cuadruploActual].op1, nivelAlcance)
+			v_2 = getValorMemoria(listaCuadruplos[cuadruploActual+1].op1, nivelAlcance)
+			cuadruploActual = cuadruploActual + 1
+			trazo(tortuga, v_1, v_2)
+		# ------------------------------------------
 
 		elif code['leer'] == operacionCuadruplo:
 			# Direccion donde se almacenara el resultado de la operacion
@@ -532,8 +599,8 @@ def mainMaquinaVirtual():
 	print(memEjecucion)
 
 	#Se agregan a memoria constantes predefinidas booleanas
-	memEjecucion[posInicial['booleanCTE']] = False
-	memEjecucion[posInicial['booleanCTE'] + 1] = True
+	memEjecucion[int(posInicial['booleanCTE'])] = False
+	memEjecucion[int(posInicial['booleanCTE'] + 1)] = True
 
 
 # Función que compila el programa
@@ -726,3 +793,6 @@ def main():
 # Llamada al main
 if __name__ == "__main__":
     main()
+
+raiz.mainloop()
+# ---------------
