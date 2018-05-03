@@ -33,14 +33,13 @@ cuadruplos = []
 
 numParametros = 1 # Numero de parametros
 tamanoActual = 0  # Tamaño del arreglo
-ERROR = False
+arregloDec = False
 
 # Cubo semantico
 cubo = Cubo()
 
 def p_procFinal(p):
 	'procFinal : '
-	#print(dirProcedimientos)
 	print(pilaOperadores)
 	print(pilaOperandos)
 	print(pilaSaltos)
@@ -162,14 +161,16 @@ def p_NP4_Variable(p):
 def p_sNP6_Lista(p):
 	'NP6_Lista :'
 
-	tamanoArreglo = pilaOperandos.pop()		# Obtenemos el tamaño del arreglo
-	print(tamanoArreglo)
+	# Descartar direccion, ocupamos el numero en si
+	pilaOperandos.pop()
+
+	tamanoArreglo = p[-3]		# Obtenemos el tamaño del arreglo
 
 	# Si el tamaño es menor a 0
 	if int(tamanoArreglo) < 0:
 		finalizar("Linea " + str(lineaActual) + " -> El tamaño del arreglo debe ser mayor o igual a 0")
 	# Obtenemos el nombre del arreglo, ya fue declarado, solo hay que actualizar el tamano
-	nombreVariable = p[-3]
+	nombreVariable = p[-6]
 	tipoArreglo = tipoActual # Tipo del arreglo
 
 	# Actualizar tamaño de la variable (arreglo)
@@ -272,7 +273,6 @@ def p_NP_FinInvocacion(p):
 		dirRetorno = dirProcedimientos['funciones'][funcionInvocada]['mem']
 		if dirRetorno == None: return
 
-		print("DirRetorno", dirRetorno)
 		# Crear el cuadruplo que guarda el valor de retorno
 		if dirRetorno != -1:
 			tipoRetorno = simbol(getTipo(dirRetorno))
@@ -357,6 +357,7 @@ def p_NP_Ciclo_Cierre(p):
 # Proc que crea los cuadruplos de sumas y restas
 def p_NP_SumResPendientes(p):
 	'NP_SumResPendientes :'
+
 	# pregunto si tengo sumas o restas pendientes por resolver
 	if len(pilaOperadores) > 0 and (pilaOperadores[-1] == code['+'] or pilaOperadores[-1] == code['-']):
 		
@@ -467,8 +468,10 @@ def p_NP_OpRelacionalesPendientes(p):
 # Operadores de asignación pendientes
 def p_NP_Asignacion(p):
 	'NP_Asignacion :'
+
 	resultDir = pilaOperandos.pop()
 	varDir = pilaOperandos.pop()
+	
 
 	if cubo.revisar(getTipo(resultDir), getTipo(varDir), code['=']) != 'error':
 		crearCuadruplo(code['='], resultDir, None, varDir)
@@ -623,7 +626,6 @@ def nuevaBoolCTE(valBool):
 	global pilaOperadores
 	if valBool == 'verdadero':
 		pilaOperandos.append(registrosMem[contadorReg['booleanCTE']] + 1)
-		#print(registrosMem[contadorReg['booleanCTE']] + 1)
 	else: pilaOperandos.append(registrosMem[contadorReg['booleanCTE']])
 
 # Crea un cuadruplo
@@ -637,20 +639,44 @@ def crearCuadruplo(operador, op1, op2, registro):
 	cuadruplos[-1].op2 = op2
 	cuadruplos[-1].reg = registro
 
-def validarIDSemantica(IDNombreActual, arreglo=""):
+def validarIDSemantica2(IDNombreActual, arreglo=""):
 	# Validar que existe la variable
 	if not existeVariable(IDNombreActual):
 		finalizar("Linea " + str(lineaActual) + " -> La variable " + str(IDNombreActual) + " no está declarada")
 
-	# Si variable existe, insertarla en la pila de operandos
-	if funcionActual != '' and IDNombreActual in dirProcedimientos['funciones'][funcionActual]['variables']:
-		pilaOperandos.append(dirProcedimientos['funciones'][funcionActual]['variables'][IDNombreActual]['mem'])
-
-	elif IDNombreActual in dirProcedimientos['variables']:
-		pilaOperandos.append(dirProcedimientos['variables'][IDNombreActual]['mem'])
-	# Borrar este else
+	if arreglo == '[':
+		accesoArreglo(IDNombreActual)
 	else:
-		finalizar("Linea " + str(lineaActual) + " -> La variable " + str(IDNombreActual) + " no fue encontrada")
+		# Si variable existe, insertarla en la pila de operandos
+		if funcionActual != '' and IDNombreActual in dirProcedimientos['funciones'][funcionActual]['variables']:
+			pilaOperandos.append(dirProcedimientos['funciones'][funcionActual]['variables'][IDNombreActual]['mem'])
+
+		elif IDNombreActual in dirProcedimientos['variables']:
+			pilaOperandos.append(dirProcedimientos['variables'][IDNombreActual]['mem'])
+		# Borrar este else
+		else:
+			finalizar("Linea " + str(lineaActual) + " -> La variable " + str(IDNombreActual) + " no fue encontrada")
+
+def validarIDSemantica(IDNombreActual, arreglo=""):
+	if not existeVariable(IDNombreActual):
+		finalizar("Variable " + IDNombreActual + " no declarada")
+	# validar que no sea una varible de retorno de funcino
+	if IDNombreActual in dirProcedimientos['funciones']:
+		finalizar("Variable " + IDNombreActual + " es el nombre de una función")
+	# si es arreglo hacer validaciones
+	if arreglo == '[':
+		# siempre sera accesible
+		accesoArreglo(IDNombreActual)
+	else:
+		# variable valida, insertar a pila
+		if IDNombreActual in dirProcedimientos['variables']:
+			# Estan siendo utilizadas dentro de su contexto, no ocupo privilegios
+			pilaOperandos.append(dirProcedimientos['variables'][IDNombreActual]['mem'])
+		elif funcionActual == '' or IDNombreActual in dirProcedimientos['funciones'][funcionActual]['variables']:
+			# las variables locales no tienen privilegios
+			pilaOperandos.append(dirProcedimientos['funciones'][funcionActual]['variables'][IDNombreActual]['mem'])
+		else:
+			finalizar("Variable " + IDNombreActual + " no encontrada")
 
 def getEspacioMemoria(tipoVariable, scope):
 	tipoMemoria = tipoVariable + scope				# Tipo de dato para saber donde guardar
@@ -692,5 +718,6 @@ def accesoArreglo(IDNombreActual):
 	if not dirBase in dirConstantes:
 		dirConstantes[dirBase] = registrosMem[contadorReg['intCTE']]
 		registrosMem[contadorReg['intCTE']] += 1
+
 	crearCuadruplo(code['+'], dirConstantes[dirBase], indexMem, nuevaTemporal)
 	pilaOperandos.append(nuevaTemporal * -1)
