@@ -62,7 +62,7 @@ def p_llamada(p):
 				| ESCRIBIR NP_FuncEspParam PAREN_IZQ expresion NP_ArgFunEsp PAREN_DER
 				| MOSTRAR_VALOR NP_FuncEspParam PAREN_IZQ expresion NP_ArgFunEsp PAREN_DER
 				| FIN NP_FuncEsp PAREN_IZQ PAREN_DER
-				| ID NP_ERA PAREN_IZQ llamadaP PAREN_DER NP_FinInvocacion'''
+				| ID NP_ERA PAREN_IZQ NP_AgrupacionAbre llamadaP NP_AgrupacionCierra PAREN_DER NP_FinInvocacion'''
 def p_llamadaP(p):
 	'''llamadaP : expresion NP_Argumento llamadaPP
     			| empty'''

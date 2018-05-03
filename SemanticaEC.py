@@ -221,6 +221,7 @@ def p_NP_Argumento(p):
 def p_NP_ERA(p):
 	'NP_ERA : '
 	global numParametros, funcionInvocada
+
 	funcionInvocada = p[-1] # Guardar el nombre de la función invocada
 	numParametros = 1	   # Inicializar el contador de parametros
 
@@ -231,11 +232,27 @@ def p_NP_ERA(p):
 	else:
 		finalizar("Linea " + str(lineaActual) + " -> La funcion " + funcionInvocada + " no esta declarada")
 
+
+def p_smNewInvocacion(p):
+	global funcionInvocada
+	global numParametros
+
+	numParametros = 1
+
+	nombreFuncion = p[-2]
+	funcionInvocada = nombreFuncion
+
+	if nombreFuncion in dirProcedimientos['funciones']:
+		# Funcion simple en el scope actual
+		crearCuadruplo(code['ERA'], None, None, dirProcedimientos['funciones'][nombreFuncion]['cuadruplo'])
+	else:
+		finalizar("Funcion " + nombreFuncion + " no fue declarada")
+                
 # Procedimiento que crea el cuadruplo de retorno
 def p_NP_Retorno(p):
 	'NP_Retorno :'
 	if funcionActual == "":
-		finalizar("Linea", lineaActual, "-> Retorno fuera de función")
+		finalizar("Linea " + str(lineaActual) + " -> Retorno fuera de función")
 		
 	# Obtenemos la direccion del valor de retorno
 	memRetorno = pilaOperandos.pop()
@@ -244,7 +261,7 @@ def p_NP_Retorno(p):
 	tipoFuncion = dirProcedimientos['funciones'][funcionActual]['retorno']
 		
 	if tipoFuncion == "void":
-		finalizar("Linea", lineaActual, "-> La función", funcionActual, "no debe retornar valor")
+		finalizar("Linea" + str(lineaActual) + "-> La función " + funcionActual + " no debe retornar valor")
 	# Direccion de la funcion global que almacena el retorno
 	dirRetornoGlobal = dirProcedimientos['funciones'][funcionActual]['mem']
 		
@@ -253,7 +270,7 @@ def p_NP_Retorno(p):
 		crearCuadruplo(code["regresa"], memRetorno, None, dirRetornoGlobal)
 		crearCuadruplo(code["finProc"], None, None, None)
 	else:
-		finalizar("Linea", lineaActual, "-> Tipo incorrecto de retorno en la funcion")
+		finalizar("Linea " + str(lineaActual) + " -> Tipo incorrecto de retorno en la funcion")
 
 # Llamada dedes p_valor
 def p_NP_FinInvocacion(p):
@@ -277,7 +294,7 @@ def p_NP_FinInvocacion(p):
 			registrosMem[contadorReg[tipoRetorno + 'Temp']] += 1
 		
 	else:
-		terminate("Numero incorrecto de argumentos en la llamada")
+		finalizar("Numero incorrecto de argumentos en la llamada")
 
 # Condicional SI ---------------------------------------------
 
@@ -289,7 +306,7 @@ def p_NP_Si_Condicion(p):
     'NP_Si_Condicion :'
     condicion = pilaOperandos.pop()
     if getTipo(condicion) != code['boolean']:
-        finalizar("Linea", lineaActual, "-> La expresion del estatuto SI debe ser boolean")
+        finalizar("Linea " + str(lineaActual) + " -> La expresion del estatuto SI debe ser boolean")
     else:
         crearCuadruplo(code['gotof'], condicion, -1, -1)
         pilaSaltos.append(len(cuadruplos) - 1)
@@ -685,7 +702,7 @@ def accesoArreglo(IDNombreActual):
 
 	# Verificación de existencia de constante (posiblemente innecesaria)
 	if not dirBase in dirConstantes:
-		dirConstantes[dirBase] = memConts[memCont['intCTE']]
+		dirConstantes[dirBase] = registrosMem[contadorReg['intCTE']]
 		registrosMem[contadorReg['intCTE']] += 1
 	crearCuadruplo(code['+'], dirConstantes[dirBase], indexMem, nuevaTemporal)
 	pilaOperandos.append(nuevaTemporal * -1)
