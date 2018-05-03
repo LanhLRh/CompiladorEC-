@@ -46,7 +46,10 @@ palabras_reservadas = {
     'leer'              : 'LEER',
     'escribir'          : 'ESCRIBIR',
     'mostrarValor'      : 'MOSTRAR_VALOR',
-    'fin'               : 'FIN'
+    'fin'               : 'FIN',
+    'colorFondo'        : 'COLOR_FONDO',
+    'dibujaCirculo'     : 'DIBUJA_CIRCULO', 
+    'rellenarForma'     : 'RELLENAR_FORMA', 
 }
 
 # Tokens

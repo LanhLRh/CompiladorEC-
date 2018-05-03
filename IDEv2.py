@@ -66,7 +66,7 @@ cargoArchivo = False	# Bandera que indica si se abrio un archivo
 
 # Termina la ejecucion del programa y muestra un mensaje
 def finalizar(mensaje):
-	print(mensaje)
+	#print(mensaje)
 	return
 	#sys.exit()
 
@@ -122,7 +122,6 @@ def getValorMemoria(numDireccion, alcanceFuncion = 0):
 			elif tipoDato == code['dec']: valor = float(pilaMemoriaLocal[alcanceFuncion][numDireccion])
 			elif tipoDato == code['boolean']: valor = bool(pilaMemoriaLocal[alcanceFuncion][numDireccion])
 			else: valor = str(pilaMemoriaLocal[alcanceFuncion][numDireccion][1:-1])
-
 			return valor
 		# Si no esta inicializada, inicializar a valor default y regresar dicho valor
 		else:
@@ -350,7 +349,6 @@ def procesarCuadruplos():
 			direccionAlmacenar = int(encontrarDireccionAbs(listaCuadruplos[cuadruploActual].reg, nivelAlcance))
 			print("Suma:",valorOp1 + valorOp2)
 			#print("Constante:",memEjecucion[op1])
-
 			# Se almacena valor global dentro de la estructura que maneja almacenamiento global
 			if esGlobal(direccionAlmacenar):
 				memEjecucion[direccionAlmacenar] = valorOp1 + valorOp2
@@ -474,7 +472,7 @@ def procesarCuadruplos():
 			if direccionAlmacenar in memEjecucion: memEjecucion[direccionAlmacenar] = valorOp1 == valorOp2
 			#Se almacena valor local dentro de la estructura que maneja almacenamiento local
 			else: pilaMemoriaLocal[nivelAlcance][direccionAlmacenar] = valorOp1 == valorOp2
-
+        
 		elif code['!='] == operacionCuadruplo:
 			op1 = listaCuadruplos[cuadruploActual].op1 		# Direaccion del Operando 1
 			op2 = listaCuadruplos[cuadruploActual].op2 		# Direccion del Operando 2
@@ -503,10 +501,9 @@ def procesarCuadruplos():
 		elif code['colocarObjeto'] == operacionCuadruplo:
 			v_1 = getValorMemoria(listaCuadruplos[cuadruploActual].op1, nivelAlcance)
 			v_2 = getValorMemoria(listaCuadruplos[cuadruploActual+1].op1, nivelAlcance)
-			v_3 = getValorMemoria(listaCuadruplos[cuadruploActual+2].op1, nivelAlcance)
-			cuadruploActual = cuadruploActual + 2
+			cuadruploActual = cuadruploActual + 1
 			global tortuga
-			tortuga = colocarObjeto(canvas, v_2, v_3)
+			tortuga = colocarObjeto(canvas, v_1, v_2)
 
 		elif code['mover'] == operacionCuadruplo:
 			v_1 = getValorMemoria(listaCuadruplos[cuadruploActual].op1, nivelAlcance)
@@ -541,6 +538,24 @@ def procesarCuadruplos():
 			v_2 = getValorMemoria(listaCuadruplos[cuadruploActual+1].op1, nivelAlcance)
 			cuadruploActual = cuadruploActual + 1
 			trazo(tortuga, v_1, v_2)
+
+		elif code['mostrarValor'] == operacionCuadruplo:
+			v_1 = getValorMemoria(listaCuadruplos[cuadruploActual].op1, nivelAlcance)
+			v_2 = getValorMemoria(listaCuadruplos[cuadruploActual+1].op1, nivelAlcance)
+			cuadruploActual = cuadruploActual + 1
+			mostrarValor(tortuga, v_1, v_2)
+
+		elif code['colorFondo'] == operacionCuadruplo:
+			v_1 = getValorMemoria(listaCuadruplos[cuadruploActual].op1, nivelAlcance)
+			colorFondo(ventana, v_1)
+
+		elif code['dibujaCirculo'] == operacionCuadruplo:
+			v_1 = getValorMemoria(listaCuadruplos[cuadruploActual].op1, nivelAlcance)
+			dibujaCirculo(tortuga, v_1)
+
+		elif code['rellenarForma'] == operacionCuadruplo:
+			v_1 = getValorMemoria(listaCuadruplos[cuadruploActual].op1, nivelAlcance)
+			rellenarForma(tortuga, v_1)
 		# ------------------------------------------
 
 		elif code['leer'] == operacionCuadruplo:
@@ -689,7 +704,7 @@ def guardarArchivo():
 	global nombreArchivo, cargoArchivo
 	# Si hay un archivo cargado, lo sobreescribe
 	if cargoArchivo == True:
-		print('Archivo Guardado')
+		#print('Archivo Guardado')
 		with open(nombreArchivo[0], 'w') as archivo:
 				codigo = ui.txtCodigo.toPlainText()
 				archivo.write(codigo)
@@ -714,7 +729,7 @@ def abrirArchivo():
 	# Si si se selecciono un archivo, cargarlo
 	if nombreArchivo != ('', ''):
 		cargoArchivo = True
-		print('Cargo archivo', cargoArchivo)
+		#print('Cargo archivo', cargoArchivo)
 		with open(nombreArchivo[0], 'r') as archivo:
 			codigo = archivo.read()
 			ui.txtCodigo.setPlainText(codigo)
