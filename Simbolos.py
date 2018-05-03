@@ -60,6 +60,9 @@ code = {
     'escribir'          : 76,
     'mostrarValor'      : 77,
     'fin'               : 78,
+    'colorFondo'        : 79, 
+    'dibujaCirculo'     : 80,
+    'rellenarForma'     : 81,
 
     # Valor nulo
     'nulo' : 90,

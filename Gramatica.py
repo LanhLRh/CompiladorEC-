@@ -42,7 +42,7 @@ def p_retorno(p):
 	'retorno : REGRESA expresion NP_Retorno'
 
 def p_llamada(p):
-	'''llamada :  COLOCAR NP_FuncEspParam PAREN_IZQ expresion NP_ArgFunEsp COMA expresion NP_ArgFunEsp COMA expresion NP_ArgFunEsp PAREN_DER
+	'''llamada :  COLOCAR NP_FuncEspParam PAREN_IZQ expresion NP_ArgFunEsp COMA expresion NP_ArgFunEsp PAREN_DER
 				| MOVER NP_FuncEspParam PAREN_IZQ expresion NP_ArgFunEsp PAREN_DER
 				| ROTAR NP_FuncEspParam PAREN_IZQ expresion NP_ArgFunEsp PAREN_DER
 				| GIRAR_DER NP_FuncEsp PAREN_IZQ PAREN_DER
@@ -60,7 +60,10 @@ def p_llamada(p):
 				| TRAZO NP_FuncEspParam PAREN_IZQ expresion NP_ArgFunEsp COMA expresion NP_ArgFunEsp PAREN_DER
 				| LEER PAREN_IZQ identificador NP_Leer1 COMA expresion NP_Leer2 PAREN_DER
 				| ESCRIBIR NP_FuncEspParam PAREN_IZQ expresion NP_ArgFunEsp PAREN_DER
-				| MOSTRAR_VALOR NP_FuncEspParam PAREN_IZQ expresion NP_ArgFunEsp PAREN_DER
+				| MOSTRAR_VALOR NP_FuncEspParam PAREN_IZQ expresion NP_ArgFunEsp COMA expresion NP_ArgFunEsp PAREN_DER
+				| COLOR_FONDO NP_FuncEspParam PAREN_IZQ expresion NP_ArgFunEsp PAREN_DER
+				| DIBUJA_CIRCULO NP_FuncEspParam PAREN_IZQ expresion NP_ArgFunEsp PAREN_DER
+				| RELLENAR_FORMA NP_FuncEspParam PAREN_IZQ expresion NP_ArgFunEsp PAREN_DER
 				| FIN NP_FuncEsp PAREN_IZQ PAREN_DER
 				| ID NP_ERA PAREN_IZQ NP_AgrupacionAbre llamadaP NP_AgrupacionCierra PAREN_DER NP_FinInvocacion'''
 def p_llamadaP(p):

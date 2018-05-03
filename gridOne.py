@@ -30,8 +30,19 @@ def posicion(tortuga, x, y):
     tortuga.setpos(x, y)
 
 def color(tortuga, col):
-    if col == 1:
-        tortuga.color("green");
+    colores = {
+        1: "yellow",
+        2: "pink", 
+        3: "purple",
+        4: "blue",
+        5: "orange",
+        6: "green", 
+        7: "white", 
+        8: "gray", 
+        9: "red",
+        10: "black",      
+    }
+    tortuga.color(colores[col]);
 
 def trazo(tortuga, bandera, tam):
     tortuga.width(tam)
@@ -39,3 +50,30 @@ def trazo(tortuga, bandera, tam):
         tortuga.pendown()
     else:
         tortuga.penup()
+
+def mostrarValor(tortuga, mensaje, tamano):
+    tortuga.write(str(mensaje), True, align="center", font=("Arial", tamano, "normal"))
+
+def colorFondo(ventana, col):
+    colores = {
+        1: "yellow",
+        2: "pink", 
+        3: "purple",
+        4: "blue",
+        5: "orange",
+        6: "green", 
+        7: "white", 
+        8: "gray", 
+        9: "red",
+        10: "black",      
+    }
+    ventana.bgcolor(colores[col])
+
+def dibujaCirculo(tortuga, radio):
+    tortuga.circle(radio)
+
+def rellenarForma(tortuga, bandera):
+    if bandera:
+        tortuga.begin_fill()
+    else:
+        tortuga.end_fill()
