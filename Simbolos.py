@@ -74,7 +74,8 @@ code = {
     'parametro' : 102,
     'inicioFunc' : 103,
     'retu' : 104,
-    'gosub': 105
+    'gosub': 105,
+    'ver'  : 106
 }
 
 simb = {

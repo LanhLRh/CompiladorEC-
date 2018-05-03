@@ -55,11 +55,6 @@ def resetTodo():
     registrosMem[contadorReg['stringTemp']] = posInicial['stringTemp']
     registrosMem[contadorReg['booleanTemp']] = posInicial['booleanTemp']
 
-    registrosMem[contadorReg['intCTE']] = posInicial['intCTE']
-    registrosMem[contadorReg['decCTE']] = posInicial['decCTE']
-    registrosMem[contadorReg['stringCTE']] = posInicial['stringCTE']
-    registrosMem[contadorReg['booleanCTE']] = posInicial['booleanCTE']
-
 # getTipo: Regresa el tipo de dato segun la posicion de memoria que tiene asignado (en codigo)
 def getTipo(dirMemoria): 
     if dirMemoria <= posLimite['intGlobal']: return code['int']

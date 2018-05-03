@@ -58,7 +58,7 @@ def p_llamada(p):
 				| MATAR_ENEMY NP_FuncEsp PAREN_IZQ PAREN_DER
 				| COLOR NP_FuncEspParam PAREN_IZQ expresion NP_ArgFunEsp PAREN_DER
 				| TRAZO NP_FuncEspParam PAREN_IZQ expresion NP_ArgFunEsp COMA expresion NP_ArgFunEsp PAREN_DER
-				| LEER PAREN_IZQ identificador NP_Leer1 COMA expresion NP_Leer2 PAREN_DER
+				| LEER PAREN_IZQ ID NP_Leer1 COMA expresion NP_Leer2 PAREN_DER
 				| ESCRIBIR NP_FuncEspParam PAREN_IZQ expresion NP_ArgFunEsp PAREN_DER
 				| MOSTRAR_VALOR NP_FuncEspParam PAREN_IZQ expresion NP_ArgFunEsp PAREN_DER
 				| FIN NP_FuncEsp PAREN_IZQ PAREN_DER
@@ -99,18 +99,17 @@ def p_declaracionPP(p):
     					| empty'''
 def p_declaracionPPP(p):
 	'''declaracionPPP : ASIGNACION NP_VariableAPila expresion NP_Asignacion
-    					| declaracion_lista NP6_Lista
+    					| declaracion_lista
     					| empty'''
     
 # MODIFICACION: Se cambio la declaracion de lista
 def p_declaracion_lista(p):
 	'''declaracion_lista : ASIGNACION lista
-    					| CORCHETE_IZQ expresion CORCHETE_DER'''
+    					| CORCHETE_IZQ CTE_INT NP_IntCTE CORCHETE_DER NP6_Lista'''
 	p[0] = p[2]
-    
-# MODIFICION: Se cambio la asignacion a una lista
+
 def p_asignacion(p):
-    'asignacion : identificador empty ASIGNACION NP_VariableAPila expresion NP_Asignacion'
+    'asignacion : identificador empty ASIGNACION expresion NP_Asignacion'
 
 def p_condicion(p):
     'condicion : SI PAREN_IZQ expresion NP_Si_Condicion PAREN_DER LLAVE_IZQ instruccion LLAVE_DER condicion_sinosi condicion_sino NP_Si_Cierre'
@@ -221,6 +220,7 @@ def p_identificador(p):
 	'identificador : ID arreglo'
 	validarIDSemantica(p[1], p[2])
 	p[0] = p[1]
+
 def p_arreglo(p):
 	'''arreglo : CORCHETE_IZQ expresion CORCHETE_DER
 				| empty'''
